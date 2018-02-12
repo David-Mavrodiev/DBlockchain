@@ -44,9 +44,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Commands\AllCommands\Connect.cs" />
+    <Compile Include="Commands\AllCommands\WalletCreation.cs" />
     <Compile Include="Commands\Contracts\ICommandFabric.cs" />
     <Compile Include="Commands\Fabrics\CommandFabric.cs" />
+    <Compile Include="Models\Block.cs" />
     <Compile Include="Models\Blockchain.cs" />
+    <Compile Include="Models\Node.cs" />
+    <Compile Include="Models\Transaction.cs" />
+    <Compile Include="Models\Wallet.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -9,7 +9,7 @@ namespace DBlockchain.Infrastructure.Network.Fabrics
         {
             var commandName = data.CommandName;
 
-            var command = CommandsReflector.GetCommand(commandName).Item1;
+            var command = CommandsReflector.GetGlobalCommand(commandName).Item1;
 
             command.Receive(data);
         }

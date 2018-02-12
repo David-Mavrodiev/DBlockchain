@@ -5,7 +5,7 @@ using System.Net;
 
 namespace DBlockchain.Infrastructure.Command.Contracts
 {
-    public interface ICommand
+    public interface IGlobalCommand
     {
         string Send(string[] args);
 

@@ -47,10 +47,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Command\Attributes\Command.cs" />
+    <Compile Include="Command\Contracts\ILocalCommand.cs" />
+    <Compile Include="Command\Enums\CommandType.cs" />
     <Compile Include="Command\Helpers\CommandsReflector.cs" />
+    <Compile Include="Common\Constants.cs" />
     <Compile Include="Network\AsyncClient.cs" />
     <Compile Include="Network\AsyncListener.cs" />
-    <Compile Include="Command\Contracts\ICommand.cs" />
+    <Compile Include="Command\Contracts\IGlobalCommand.cs" />
     <Compile Include="Network\Fabrics\Contracts\IRequestFabric.cs" />
     <Compile Include="Network\Fabrics\Contracts\IResponseFabric.cs" />
     <Compile Include="Network\Fabrics\RequestFabric.cs" />

@@ -5,11 +5,12 @@ using DBlockchain.Infrastructure.Command.Contracts;
 using DBlockchain.Infrastructure.Commands.Attributes;
 using DBlockchain.Infrastructure.Network;
 using DBlockchain.Logic.Models;
+using DBlockchain.Infrastructure.Command.Enums;
 
 namespace DBlockchain.Logic.Commands.AllCommands
 {
-    [Command("connect", "{0} -ip {1} -p {2}")]
-    public class Connect : ICommand
+    [Command("connect", "{0} -ip {1} -p {2}", CommandType.Global)]
+    public class Connect : IGlobalCommand
     {
         private Blockchain blockchain;
 

@@ -14,6 +14,8 @@ namespace DBlockchain.Infrastructure.Network
         // Thread signal.  
         public static ManualResetEvent allDone = new ManualResetEvent(false);
         public IResponseFabric responseFabric;
+        public static int Port = 0;
+        public static Socket listener;
 
         public AsyncListener(IResponseFabric responseFabric)
         {
@@ -27,15 +29,20 @@ namespace DBlockchain.Infrastructure.Network
 
             string hostName = Dns.GetHostName(); // Retrive the Name of HOST  
             string ip = Dns.GetHostByName(hostName).AddressList[0].ToString();
-            Console.Write("Choose port: ");
-            int port = int.Parse(Console.ReadLine());
-            IPAddress ipAddress = IPAddress.Parse(ip);
-            IPEndPoint localEndPoint = new IPEndPoint(ipAddress, port);
 
-            Console.WriteLine($"Address is {ip}:{port}");
+            if (Port == 0)
+            {
+                Console.Write("Choose port: ");
+                int port = int.Parse(Console.ReadLine());
+                Port = port;
+            }
+            IPAddress ipAddress = IPAddress.Parse(ip);
+            IPEndPoint localEndPoint = new IPEndPoint(ipAddress, Port);
+
+            Console.WriteLine($"Address is {ip}:{Port}");
 
             // Create a TCP/IP socket.  
-            Socket listener = new Socket(ipAddress.AddressFamily,
+            listener = new Socket(ipAddress.AddressFamily,
                 SocketType.Stream, ProtocolType.Tcp);
 
             // Bind the socket to the local endpoint and listen for incoming connections.  
@@ -106,7 +113,7 @@ namespace DBlockchain.Infrastructure.Network
                 {
                     this.responseFabric.ReceiveResponse(content);
 
-                    var body = CommandsReflector.GetCommand(content.CommandName).Item1.Aggregate();
+                    var body = CommandsReflector.GetGlobalCommand(content.CommandName).Item1.Aggregate();
                     content.Body = body;
 
                     Send(handler, content);
@@ -143,6 +150,9 @@ namespace DBlockchain.Infrastructure.Network
                 handler.Shutdown(SocketShutdown.Both);
                 handler.Close();
 
+                listener.BeginAccept(
+                    new AsyncCallback(AcceptCallback),
+                    listener);
             }
             catch (Exception e)
             {

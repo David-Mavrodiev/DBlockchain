@@ -1,7 +1,5 @@
-﻿using DBlockchain.Infrastructure.Command.Helpers;
+﻿using DBlockchain.Infrastructure.Command.Contracts;
 using DBlockchain.Infrastructure.Network.Fabrics.Contracts;
-using System.Collections.Generic;
-using System.Text.RegularExpressions;
 
 namespace DBlockchain.Infrastructure.Network.Fabrics
 {
@@ -14,19 +12,17 @@ namespace DBlockchain.Infrastructure.Network.Fabrics
             this.client = client;
         }
 
-        public void MakeRequest(string commandName, string input)
+        public void MakeRequest(string commandName, string[] args, IGlobalCommand command, Commands.Attributes.Command attribute)
         {
-            var tuple = CommandsReflector.GetCommand(commandName);
-            var command = tuple.Item1;
-            var template = tuple.Item2.template;
+            var template = attribute.Template;
 
-            var args = ReverseStringFormat(template, input).ToArray();
             var body = command.Send(args);
 
             var targets = command.GetTargets(args);
 
             foreach (var target in targets)
             {
+                System.Console.WriteLine("Ui");
                 var socket = client.StartSocket(target.Item1, target.Item2);
 
                 var data = new SocketDataBody()
@@ -40,24 +36,9 @@ namespace DBlockchain.Infrastructure.Network.Fabrics
 
                 client.Receive(socket);
                 AsyncClient.receiveDone.WaitOne();
+
+                //client.StopSocket(socket);
             }
-        }
-
-        private static List<string> ReverseStringFormat(string template, string str)
-        {
-            string pattern = "^" + Regex.Replace(template, @"\{[0-9]+\}", "(.*?)") + "$";
-
-            Regex r = new Regex(pattern);
-            Match m = r.Match(str);
-
-            List<string> ret = new List<string>();
-
-            for (int i = 1; i < m.Groups.Count; i++)
-            {
-                ret.Add(m.Groups[i].Value);
-            }
-
-            return ret;
         }
     }
 }
