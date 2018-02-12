@@ -38,5 +38,10 @@ namespace DBlockchain.Logic.Commands.AllCommands
 
             return targets;
         }
+
+        public string Aggregate()
+        {
+            return "response body";
+        }
     }
 }

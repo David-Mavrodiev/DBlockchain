@@ -1,9 +1,6 @@
-﻿using DBlockchain.Infrastructure.Command.Contracts;
+﻿using DBlockchain.Infrastructure.Command.Helpers;
 using DBlockchain.Infrastructure.Network.Fabrics.Contracts;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 using System.Text.RegularExpressions;
 
 namespace DBlockchain.Infrastructure.Network.Fabrics
@@ -19,39 +16,9 @@ namespace DBlockchain.Infrastructure.Network.Fabrics
 
         public void MakeRequest(string commandName, string input)
         {
-            var module = "DBlockchain.Logic";
-            Assembly assembly = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(a => a.FullName == module);
-            if (assembly == null)
-            {
-                try
-                {
-                    assembly = Assembly.Load(module);
-                }
-                catch
-                {
-
-                }
-            }
-
-            var exportedTypes = assembly.ExportedTypes
-                .Where(t => t.IsClass && typeof(ICommand).IsAssignableFrom(t) &&
-                t.GetCustomAttributes(typeof(Commands.Attributes.Command)).Count() > 0).ToList();
-
-            ICommand command = null;
-            string template = null;
-
-            foreach (var type in exportedTypes)
-            {
-                var commandAttribute = type.GetCustomAttributes(typeof(Commands.Attributes.Command), true)
-                    .Cast<Commands.Attributes.Command>().FirstOrDefault();
-
-                if (commandAttribute.name == commandName)
-                {
-                    command = (ICommand)Activator.CreateInstance(type);
-                    template = commandAttribute.template;
-                    break;
-                }
-            }
+            var tuple = CommandsReflector.GetCommand(commandName);
+            var command = tuple.Item1;
+            var template = tuple.Item2.template;
 
             var args = ReverseStringFormat(template, input).ToArray();
             var body = command.Send(args);

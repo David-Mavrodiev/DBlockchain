@@ -47,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Command\Attributes\Command.cs" />
+    <Compile Include="Command\Helpers\CommandsReflector.cs" />
     <Compile Include="Network\AsyncClient.cs" />
     <Compile Include="Network\AsyncListener.cs" />
     <Compile Include="Command\Contracts\ICommand.cs" />

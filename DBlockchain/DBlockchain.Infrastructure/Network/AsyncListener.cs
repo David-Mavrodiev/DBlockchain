@@ -1,4 +1,5 @@
-﻿using DBlockchain.Infrastructure.Network.Fabrics.Contracts;
+﻿using DBlockchain.Infrastructure.Command.Helpers;
+using DBlockchain.Infrastructure.Network.Fabrics.Contracts;
 using Newtonsoft.Json;
 using System;
 using System.Net;
@@ -104,6 +105,9 @@ namespace DBlockchain.Infrastructure.Network
                 if (content != null)
                 {
                     this.responseFabric.ReceiveResponse(content);
+
+                    var body = CommandsReflector.GetCommand(content.CommandName).Item1.Aggregate();
+                    content.Body = body;
 
                     Send(handler, content);
                 }

@@ -9,6 +9,8 @@ namespace DBlockchain.Infrastructure.Command.Contracts
     {
         string Send(string[] args);
 
+        string Aggregate();
+
         void Receive(SocketDataBody data);
 
         List<Tuple<IPAddress, int>> GetTargets(string[] args);
