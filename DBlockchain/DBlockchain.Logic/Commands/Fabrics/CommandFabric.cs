@@ -2,6 +2,7 @@
 using DBlockchain.Infrastructure.Network;
 using DBlockchain.Infrastructure.Network.Fabrics.Contracts;
 using DBlockchain.Logic.Commands.Contracts;
+using DBlockchain.Logic.Models;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
@@ -11,12 +12,30 @@ namespace DBlockchain.Logic.Commands.Fabrics
     {
         private readonly IRequestFabric requestFabric;
         private readonly AsyncListener listener;
+        private static Blockchain blockchain;
 
-        public CommandFabric(IRequestFabric requestFabric, AsyncListener listener)
+        public CommandFabric(IRequestFabric requestFabric, AsyncListener listener, Blockchain blockchain)
         {
             this.requestFabric = requestFabric;
             this.listener = listener;
+            Blockchain = blockchain;
             listener.StartListening();
+        }
+
+        public static Blockchain Blockchain
+        {
+            get
+            {
+                return blockchain;
+            }
+
+            set
+            {
+                if (blockchain == null)
+                {
+                    blockchain = value;
+                }
+            }
         }
 
         public void RunCommand(string input)

@@ -15,14 +15,12 @@ namespace DBlockchain.Logic.Models
 
         public string MinedBy { get; set; }
 
-        public string BlockDataHash { get; set; }
+        public string BlockHash { get; set; }
 
         /*-----------------------------------------*/
 
         public long Nonce { get; set; }
 
         public DateTime DateCreated { get; set; }
-
-        public string BlockHash { get; set; }
     }
 }

@@ -6,6 +6,7 @@ using DBlockchain.Infrastructure.Commands.Attributes;
 using DBlockchain.Infrastructure.Network;
 using DBlockchain.Logic.Models;
 using DBlockchain.Infrastructure.Command.Enums;
+using DBlockchain.Logic.Commands.Fabrics;
 
 namespace DBlockchain.Logic.Commands.AllCommands
 {
@@ -16,7 +17,7 @@ namespace DBlockchain.Logic.Commands.AllCommands
 
         public Connect()
         {
-            this.blockchain = new Blockchain();
+            this.blockchain = CommandFabric.Blockchain;
         }
 
         public string Send(string[] args)

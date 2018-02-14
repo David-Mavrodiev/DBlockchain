@@ -21,7 +21,5 @@ namespace DBlockchain.Logic.Models
         public DateTime DateReceived { get; set; }
 
         public long MinedInBlockIndex { get; set; }
-
-        public bool Paid { get; set; }
     }
 }

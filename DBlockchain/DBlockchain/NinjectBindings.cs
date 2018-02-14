@@ -17,7 +17,7 @@ namespace DBlockchain
             Bind<AsyncClient>().To<AsyncClient>();
             Bind<AsyncListener>().To<AsyncListener>();
             Bind<ICommandFabric>().To<CommandFabric>();
-            Bind<Blockchain>().To<Blockchain>();
+            Bind<Blockchain>().To<Blockchain>().InSingletonScope();
         }
     }
 }

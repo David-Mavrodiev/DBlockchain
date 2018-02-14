@@ -1,23 +1,18 @@
 ﻿using DBlockchain.Infrastructure.Common;
 using DBlockchain.Infrastructure.Network;
-using Org.BouncyCastle.Asn1.Sec;
-using Org.BouncyCastle.Asn1.X9;
+using DBlockchain.Logic.Utils;
 using Org.BouncyCastle.Crypto;
-using Org.BouncyCastle.Crypto.Digests;
 using Org.BouncyCastle.Crypto.Generators;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Math;
 using Org.BouncyCastle.Math.EC;
 using Org.BouncyCastle.Security;
 using System;
-using System.Linq;
-using System.Text;
 
 namespace DBlockchain.Logic.Wallet
 {
     public class WalletProvider
     {
-        public static readonly X9ECParameters curve = SecNamedCurves.GetByName("secp256k1");
         private static BigInteger privateKey;
 
         public WalletProvider()
@@ -40,12 +35,6 @@ namespace DBlockchain.Logic.Wallet
             return false;
         }
 
-        public static ECPoint GetPublicKeyFromPrivateKey(BigInteger privKey)
-        {
-            ECPoint pubKey = curve.G.Multiply(privKey).Normalize();
-            return pubKey;
-        }
-
         private static void GenerateIdentity(int keySize = 256)
         {
             ECKeyPairGenerator gen = new ECKeyPairGenerator();
@@ -64,56 +53,11 @@ namespace DBlockchain.Logic.Wallet
 
             ECPoint pubKey = ((ECPublicKeyParameters)keyPair.Public).Q;
 
-            string pubKeyCompressed = EncodeECPointHexCompressed(pubKey);
+            string pubKeyCompressed = CryptographyUtilities.EncodeECPointHexCompressed(pubKey);
             Console.WriteLine("Public key (compressed): " + pubKeyCompressed);
 
-            string addr = CalcRipeMD160(pubKeyCompressed);
+            string addr = CryptographyUtilities.CalcRipeMD160(pubKeyCompressed);
             Console.WriteLine("Blockchain address: " + addr);
-        }
-
-        private static byte[] SignData(BigInteger privateKey, byte[] data)
-        {
-            ECDomainParameters ecSpec = new ECDomainParameters(curve.Curve, curve.G, curve.N, curve.H);
-            ECPrivateKeyParameters keyParameters = new ECPrivateKeyParameters(privateKey, ecSpec);
-
-            ISigner signer = SignerUtilities.GetSigner("SHA-256withECDSA");
-            signer.Init(true, keyParameters);
-            signer.BlockUpdate(data, 0, data.Length);
-            byte[] sigBytes = signer.GenerateSignature();
-
-            return sigBytes;
-        }
-
-        private static bool VerifySigniture(byte[] data, byte[] signiture)
-        {
-            var publicKey = GetPublicKeyFromPrivateKey(privateKey);
-            ISigner signer = SignerUtilities.GetSigner("SHA-256withECDSA");
-            ECDomainParameters ecSpec = new ECDomainParameters(curve.Curve, curve.G, curve.N, curve.H);
-            ECPublicKeyParameters keyParameters = new ECPublicKeyParameters(publicKey, ecSpec);
-            signer.Init(false, keyParameters);
-            signer.BlockUpdate(data, 0, data.Length);
-            return signer.VerifySignature(signiture);
-        }
-
-        public static string BytesToHex(byte[] bytes)
-        {
-            return string.Concat(bytes.Select(b => b.ToString("x2")));
-        }
-
-        private static string CalcRipeMD160(string text)
-        {
-            byte[] bytes = Encoding.UTF8.GetBytes(text);
-            RipeMD160Digest digest = new RipeMD160Digest();
-            digest.BlockUpdate(bytes, 0, bytes.Length);
-            byte[] result = new byte[digest.GetDigestSize()];
-            digest.DoFinal(result, 0);
-            return BytesToHex(result);
-        }
-
-        public static string EncodeECPointHexCompressed(ECPoint point)
-        {
-            BigInteger x = point.XCoord.ToBigInteger();
-            return x.ToString(16) + Convert.ToInt32(!x.TestBit(0));
         }
 
         public void GenerateWallet()
