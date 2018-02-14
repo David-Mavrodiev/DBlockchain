@@ -1,6 +1,7 @@
 ﻿using DBlockchain.Infrastructure.Command.Contracts;
 using DBlockchain.Infrastructure.Command.Enums;
 using DBlockchain.Infrastructure.Commands.Attributes;
+using DBlockchain.Logic.Wallet;
 using System;
 
 namespace DBlockchain.Logic.Commands.AllCommands
@@ -11,6 +12,17 @@ namespace DBlockchain.Logic.Commands.AllCommands
         public void Run(string[] args)
         {
             Console.WriteLine("Wallet creation...");
+
+            WalletProvider walletProvider = new WalletProvider();
+
+            if (!walletProvider.HasWallet())
+            {
+                walletProvider.GenerateWallet();
+            }
+            else
+            {
+                Console.WriteLine("Already has wallet...");
+            }
         }
     }
 }
