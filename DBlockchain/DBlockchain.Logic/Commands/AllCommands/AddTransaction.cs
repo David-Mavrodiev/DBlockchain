@@ -27,7 +27,7 @@ namespace DBlockchain.Logic.Commands.AllCommands
 
         public string Aggregate()
         {
-            throw new NotImplementedException();
+            return "Done";
         }
 
         public List<Tuple<IPAddress, int>> GetTargets(string[] args)

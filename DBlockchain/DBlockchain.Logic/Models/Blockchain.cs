@@ -3,6 +3,8 @@ using DBlockchain.Infrastructure.Network;
 using DBlockchain.Logic.Utils;
 using DBlockchain.Logic.Wallet;
 using Newtonsoft.Json;
+using Org.BouncyCastle.Math.EC;
+using Org.BouncyCastle.Utilities.Encoders;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -132,14 +134,20 @@ namespace DBlockchain.Logic.Models
 
         public Transaction AddTransaction(string from, string to, decimal amount, WalletProvider walletProvider)
         {
+            var publicKeyHex = CryptographyUtilities.BytesToHex(walletProvider.PublicKey.GetEncoded());
             var transaction = new Transaction()
-            {
-                From = from,
-                To = to,
-                Value = amount
+                {
+                    From = from,
+                    To = to,
+                    Value = amount,
+                    SenderPublicKey = publicKeyHex
             };
 
-            string transactionJson = JsonConvert.SerializeObject(transaction);
+            string transactionJson = JsonConvert.SerializeObject(transaction, new JsonSerializerSettings()
+            {
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+            });
+            
             var transactionHash = CryptographyUtilities.BytesToHex(CryptographyUtilities.CalcSHA256(transactionJson));
 
             var signiture = walletProvider.SignTransaction(Encoding.UTF8.GetBytes(transactionHash));
@@ -150,16 +158,19 @@ namespace DBlockchain.Logic.Models
 
             StorageFileProvider<Transaction[]>.SetModel(Constants.PendingTransactionsFilePath, this.pendingTransactions.ToArray());
 
+            Console.WriteLine("Transaction is pending...");
+
             return transaction;
         }
 
         public Transaction AddTransaction(Transaction transaction)
         {
             var bytes = Encoding.UTF8.GetBytes(transaction.TransactionHash);
-
             Console.WriteLine("Try add pending transaction...");
 
-            if (CryptographyUtilities.VerifySigniture(bytes, transaction.SenderSignature, transaction.SenderPublicKey))
+            ECPoint senderPublicKey = CryptographyUtilities.DecodeECPointFromHex(transaction.SenderPublicKey);
+
+            if (CryptographyUtilities.VerifySigniture(bytes, transaction.SenderSignature, senderPublicKey))
             {
                 Console.WriteLine("Done...");
 

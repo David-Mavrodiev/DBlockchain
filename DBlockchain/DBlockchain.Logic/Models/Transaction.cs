@@ -1,5 +1,4 @@
-﻿using Org.BouncyCastle.Math.EC;
-using System;
+﻿using System;
 
 namespace DBlockchain.Logic.Models
 {
@@ -11,7 +10,7 @@ namespace DBlockchain.Logic.Models
 
         public decimal Value { get; set; }
 
-        public ECPoint SenderPublicKey { get; set; }
+        public string SenderPublicKey { get; set; }
 
         public byte[] SenderSignature { get; set; }
 

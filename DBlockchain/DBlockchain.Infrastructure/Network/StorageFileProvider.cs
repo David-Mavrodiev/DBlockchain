@@ -30,7 +30,10 @@ namespace DBlockchain.Infrastructure.Network
 
         public static void SetModel(string path, T model)
         {
-            File.WriteAllText(path, JsonConvert.SerializeObject(model));
+            File.WriteAllText(path, JsonConvert.SerializeObject(model, new JsonSerializerSettings()
+            {
+                ReferenceLoopHandling = ReferenceLoopHandling.Serialize
+            }));
         }
     }
 }

@@ -6,6 +6,7 @@ using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Math;
 using Org.BouncyCastle.Math.EC;
 using Org.BouncyCastle.Security;
+using Org.BouncyCastle.Utilities.Encoders;
 using System;
 using System.Linq;
 using System.Text;
@@ -74,6 +75,13 @@ namespace DBlockchain.Logic.Utils
         {
             BigInteger x = point.XCoord.ToBigInteger();
             return x.ToString(16) + Convert.ToInt32(!x.TestBit(0));
+        }
+
+        public static ECPoint DecodeECPointFromHex(string hex)
+        {
+            ECPoint point = CryptographyUtilities.curve.Curve.DecodePoint(Hex.Decode(hex)).Normalize();
+
+            return point;
         }
     }
 }
