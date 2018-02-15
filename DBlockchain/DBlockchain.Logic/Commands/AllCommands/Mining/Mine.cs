@@ -1,10 +1,13 @@
 ﻿using DBlockchain.Infrastructure.Command.Contracts;
 using DBlockchain.Infrastructure.Command.Enums;
 using DBlockchain.Infrastructure.Commands.Attributes;
+using DBlockchain.Logic.Commands.Contracts;
 using DBlockchain.Logic.Commands.Fabrics;
 using DBlockchain.Logic.Models;
 using DBlockchain.Logic.Utils;
+using Ninject;
 using System;
+using System.IO;
 using System.Linq;
 using System.Threading;
 
@@ -36,6 +39,8 @@ namespace DBlockchain.Logic.Commands.AllCommands.Mining
             Console.WriteLine($"Found hash: {hash}...");
             Console.ResetColor();
             Console.WriteLine("+++++++++++++++++++++++++");
+
+            CommandFabric.RunDynamic($"send-mining-result -nonce {nonce}");
         }
 
         public void MineAsync()

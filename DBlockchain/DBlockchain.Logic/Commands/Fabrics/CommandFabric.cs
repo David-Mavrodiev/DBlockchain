@@ -10,14 +10,14 @@ namespace DBlockchain.Logic.Commands.Fabrics
 {
     public class CommandFabric : ICommandFabric
     {
-        private readonly IRequestFabric requestFabric;
-        private readonly AsyncListener listener;
+        private static IRequestFabric requestFabric;
+        private static AsyncListener listener;
         private static Blockchain blockchain;
 
-        public CommandFabric(IRequestFabric requestFabric, AsyncListener listener, Blockchain blockchain)
+        public CommandFabric(IRequestFabric fabric, AsyncListener asyncListener, Blockchain blockchain)
         {
-            this.requestFabric = requestFabric;
-            this.listener = listener;
+            requestFabric = fabric;
+            listener = asyncListener;
             Blockchain = blockchain;
             listener.StartListening();
         }
@@ -34,6 +34,36 @@ namespace DBlockchain.Logic.Commands.Fabrics
                 if (blockchain == null)
                 {
                     blockchain = value;
+                }
+            }
+        }
+
+        public static void RunDynamic(string input)
+        {
+            var name = input.Split(' ')[0];
+
+            var local = CommandsReflector.GetLocalCommand(name);
+
+            if (local.Item1 != null)
+            {
+                var localCommand = local.Item1;
+                var attribute = local.Item2;
+
+                var args = ReverseStringFormat(attribute.Template, input).ToArray();
+
+                localCommand.Run(args);
+            }
+            else
+            {
+                var global = CommandsReflector.GetGlobalCommand(name);
+                var globalCommand = global.Item1;
+                var attribute = global.Item2;
+
+                var args = ReverseStringFormat(attribute.Template, input).ToArray();
+
+                if (globalCommand.ValidateInput(args))
+                {
+                    requestFabric.MakeRequest(name, args, globalCommand, attribute);
                 }
             }
         }

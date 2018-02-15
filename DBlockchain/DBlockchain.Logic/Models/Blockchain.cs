@@ -201,6 +201,45 @@ namespace DBlockchain.Logic.Models
             return false;
         }
 
+        public Block AddBlock(int nonce, WalletProvider walletProvider)
+        {
+            string lastBlockHash = this.LastBlock.BlockHash;
+            string winnerHash = CryptographyUtilities.BytesToHex(CryptographyUtilities.CalcSHA256($"{lastBlockHash}{nonce}"));
+
+            if (!winnerHash.ToCharArray().Take(this.Difficulty).All(s => s == '0'))
+            {
+                return null;
+            }
+
+            var transactions = this.pendingTransactions;
+
+            foreach (var transaction in transactions)
+            {
+                transaction.DateReceived = DateTime.Now;
+                transaction.MinedInBlockIndex = this.LastBlock.Index + 1;
+            }
+
+            var block = new Block()
+            {
+                Index = this.LastBlock.Index + 1,
+                DateCreated = DateTime.Now,
+                Difficulty = this.Difficulty,
+                MinedBy = walletProvider.Address,
+                Nonce = nonce,
+                PreviousBlockHash = this.LastBlock.BlockHash,
+                Transactions = transactions.ToList()
+            };
+
+            string blockJson = JsonConvert.SerializeObject(block);
+            var blockHash = CryptographyUtilities.BytesToHex(CryptographyUtilities.CalcSHA256(blockJson));
+            block.BlockHash = blockHash;
+
+            this.blocks.Add(block);
+            StorageFileProvider<Block>.SetModel($"{Constants.BlocksFilePath}/block_{block.Index}.json", block);
+
+            return block;
+        }
+
         public Transaction AddTransaction(string from, string to, decimal amount, WalletProvider walletProvider)
         {
             this.CalculateBalances(0);

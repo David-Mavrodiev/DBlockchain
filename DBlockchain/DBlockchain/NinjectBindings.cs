@@ -8,16 +8,16 @@ using Ninject.Modules;
 
 namespace DBlockchain
 {
-    public class NinjectBindings : NinjectModule
-    {
-        public override void Load()
-        {
-            Bind<IRequestFabric>().To<RequestFabric>();
-            Bind<IResponseFabric>().To<ResponseFabric>();
-            Bind<AsyncClient>().To<AsyncClient>();
-            Bind<AsyncListener>().To<AsyncListener>();
-            Bind<ICommandFabric>().To<CommandFabric>();
-            Bind<Blockchain>().To<Blockchain>().InSingletonScope();
-        }
-    }
+    //public class NinjectBindings : NinjectModule
+    //{
+    //    public override void Load()
+    //    {
+    //        Bind<IRequestFabric>().To<RequestFabric>();
+    //        Bind<IResponseFabric>().To<ResponseFabric>();
+    //        Bind<AsyncClient>().To<AsyncClient>();
+    //        Bind<AsyncListener>().To<AsyncListener>();
+    //        Bind<ICommandFabric>().To<CommandFabric>();
+    //        Bind<Blockchain>().To<Blockchain>().InSingletonScope();
+    //    }
+    //}
 }

@@ -25,7 +25,7 @@ namespace DBlockchain.Infrastructure.Network
         public void StartListening()
         {
             // Data buffer for incoming data.  
-            byte[] bytes = new Byte[1024 * 5];
+            byte[] bytes = new Byte[1024 * 20];
 
             string hostName = Dns.GetHostName(); // Retrive the Name of HOST  
             string ip = Dns.GetHostByName(hostName).AddressList[0].ToString();
@@ -106,8 +106,7 @@ namespace DBlockchain.Infrastructure.Network
                     state.buffer, 0, bytesRead));
 
                 // Check for end-of-file tag. If it is not there, read   
-                // more data.  
-
+                // more data.
                 content = JsonConvert.DeserializeObject<SocketDataBody>(state.sb.ToString());
 
                 if (content != null)
