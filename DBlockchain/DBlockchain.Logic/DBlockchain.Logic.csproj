@@ -111,7 +111,10 @@
     <Compile Include="Commands\AllCommands\AddTransaction.cs" />
     <Compile Include="Commands\AllCommands\Connect.cs" />
     <Compile Include="Commands\AllCommands\GetBalance.cs" />
+    <Compile Include="Commands\AllCommands\GetAccountInfo.cs" />
     <Compile Include="Commands\AllCommands\GetPeers.cs" />
+    <Compile Include="Commands\AllCommands\Mining\Mine.cs" />
+    <Compile Include="Commands\AllCommands\Mining\SendMiningResult.cs" />
     <Compile Include="Commands\AllCommands\WalletCreation.cs" />
     <Compile Include="Commands\Contracts\ICommandFabric.cs" />
     <Compile Include="Commands\Fabrics\CommandFabric.cs" />

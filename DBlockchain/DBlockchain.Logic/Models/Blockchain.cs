@@ -19,6 +19,7 @@ namespace DBlockchain.Logic.Models
         private IList<Node> peers;
         private readonly IList<Block> blocks;
         private IList<Transaction> pendingTransactions;
+        private readonly int difficulty = 5;
 
         public Blockchain()
         {
@@ -36,6 +37,22 @@ namespace DBlockchain.Logic.Models
             }
 
             this.CalculateBalances(0);
+        }
+
+        public int Difficulty
+        {
+            get
+            {
+                return this.difficulty;
+            }
+        }
+
+        public Block LastBlock
+        {
+            get
+            {
+                return this.blocks.Last();
+            }
         }
 
         public IList<Node> Peers
