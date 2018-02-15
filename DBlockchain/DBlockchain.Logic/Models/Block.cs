@@ -5,7 +5,7 @@ namespace DBlockchain.Logic.Models
 {
     public class Block
     {
-        public long Index { get; set; }
+        public int Index { get; set; }
 
         public List<Transaction> Transactions { get; set; }
 
@@ -19,7 +19,7 @@ namespace DBlockchain.Logic.Models
 
         /*-----------------------------------------*/
 
-        public long Nonce { get; set; }
+        public int Nonce { get; set; }
 
         public DateTime DateCreated { get; set; }
     }

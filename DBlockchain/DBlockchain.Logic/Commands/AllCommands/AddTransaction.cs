@@ -24,7 +24,7 @@ namespace DBlockchain.Logic.Commands.AllCommands
             this.walletProvider = new WalletProvider();
         }
 
-        public string Aggregate()
+        public string Aggregate(SocketDataBody body)
         {
             return "Done";
         }

@@ -47,10 +47,10 @@ namespace DBlockchain.Logic.Commands.AllCommands.Mining
         {
             int nonce = 0;
             string hash;
-            var lastBlockHash = this.blockchain.LastBlock.BlockHash;
 
             while (true)
             {
+                var lastBlockHash = this.blockchain.LastBlock.BlockHash;
                 hash = CryptographyUtilities.BytesToHex(CryptographyUtilities.CalcSHA256($"{lastBlockHash}{nonce}"));
 
                 if (hash.ToCharArray().Take(this.blockchain.Difficulty).All(s => s == '0'))

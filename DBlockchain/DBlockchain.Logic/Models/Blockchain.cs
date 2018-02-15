@@ -55,6 +55,14 @@ namespace DBlockchain.Logic.Models
             }
         }
 
+        public List<Block> Blocks
+        {
+            get
+            {
+                return this.blocks.ToList();
+            }
+        }
+
         public IList<Node> Peers
         {
             get
@@ -208,6 +216,7 @@ namespace DBlockchain.Logic.Models
 
             if (!winnerHash.ToCharArray().Take(this.Difficulty).All(s => s == '0'))
             {
+                Console.WriteLine("Incorrect winner hash...");
                 return null;
             }
 
@@ -236,6 +245,30 @@ namespace DBlockchain.Logic.Models
 
             this.blocks.Add(block);
             StorageFileProvider<Block>.SetModel($"{Constants.BlocksFilePath}/block_{block.Index}.json", block);
+
+            //Shoud think :-)
+            this.pendingTransactions = new List<Transaction>();
+
+            return block;
+        }
+
+        public Block AddBlock(Block block)
+        {
+            int nonce = block.Nonce;
+            string lastBlockHash = this.LastBlock.BlockHash;
+            string winnerHash = CryptographyUtilities.BytesToHex(CryptographyUtilities.CalcSHA256($"{lastBlockHash}{nonce}"));
+
+            if (!winnerHash.ToCharArray().Take(this.Difficulty).All(s => s == '0'))
+            {
+                Console.WriteLine("Incorrect winner hash...");
+                return null;
+            }
+
+            this.blocks.Add(block);
+            StorageFileProvider<Block>.SetModel($"{Constants.BlocksFilePath}/block_{block.Index}.json", block);
+
+            //Shoud think :-)
+            this.pendingTransactions = new List<Transaction>();
 
             return block;
         }

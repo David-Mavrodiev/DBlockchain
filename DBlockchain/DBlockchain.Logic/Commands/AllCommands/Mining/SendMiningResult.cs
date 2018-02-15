@@ -26,9 +26,9 @@ namespace DBlockchain.Logic.Commands.AllCommands
             this.blockchain = CommandFabric.Blockchain;
         }
 
-        public string Aggregate()
+        public string Aggregate(SocketDataBody data)
         {
-            return "Aggregate";
+            return this.blockchain.LastBlock.Index.ToString();
         }
 
         public List<Tuple<IPAddress, int>> GetTargets(string[] args)
@@ -45,7 +45,51 @@ namespace DBlockchain.Logic.Commands.AllCommands
 
         public void Receive(SocketDataBody data)
         {
-            Console.WriteLine("Receive");
+            Console.WriteLine($"{data.NodesPair.Item1} -> {data.NodesPair.Item2}");
+            if (data.Type == SocketDataType.Send)
+            {
+                var block = JsonConvert.DeserializeObject<Block>(data.Body);
+
+                if (block.Index == this.blockchain.LastBlock.Index + 1 &&
+                    block.PreviousBlockHash == this.blockchain.LastBlock.BlockHash)
+                {
+                    string lastBlockHash = this.blockchain.LastBlock.BlockHash;
+                    int nonce = block.Nonce;
+                    string winnerHash = CryptographyUtilities.BytesToHex(CryptographyUtilities.CalcSHA256($"{lastBlockHash}{nonce}"));
+
+                    if (!winnerHash.ToCharArray().Take(this.blockchain.Difficulty).All(s => s == '0'))
+                    {
+                        Console.WriteLine("Incorrect hash...");
+                        return;
+                    }
+
+                    this.blockchain.AddBlock(block);
+                }
+                else
+                {
+                    Console.WriteLine("This node may not synced with 2 or more blocks...");
+                    Console.WriteLine("Checking...");
+
+                    var ip = data.NodesPair.Item1.Split(':')[0];
+                    var port = int.Parse(data.NodesPair.Item1.Split(':')[1]);
+
+                    CommandFabric.RunDynamic($"sync -ip {ip} -p {port}");
+                }
+            }
+            else if(data.Type == SocketDataType.Receive)
+            {
+                int blockIndex = int.Parse(data.Body);
+                if (blockIndex > this.blockchain.LastBlock.Index)
+                {
+                    Console.WriteLine("This node may not synced with 1 or more blocks...");
+                    Console.WriteLine("Checking...");
+
+                    var ip = data.NodesPair.Item2.Split(':')[0];
+                    var port = int.Parse(data.NodesPair.Item2.Split(':')[1]);
+
+                    CommandFabric.RunDynamic($"sync -ip {ip} -p {port}");
+                }
+            }
         }
 
         public string Send(string[] args)

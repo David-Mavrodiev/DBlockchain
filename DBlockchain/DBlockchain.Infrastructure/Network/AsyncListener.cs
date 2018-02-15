@@ -113,7 +113,7 @@ namespace DBlockchain.Infrastructure.Network
                 {
                     this.responseFabric.ReceiveResponse(content);
 
-                    var body = CommandsReflector.GetGlobalCommand(content.CommandName).Item1.Aggregate();
+                    var body = CommandsReflector.GetGlobalCommand(content.CommandName).Item1.Aggregate(content);
                     content.Body = body;
                     content.Type = SocketDataType.Receive;
 

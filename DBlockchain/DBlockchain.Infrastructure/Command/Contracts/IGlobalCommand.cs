@@ -11,7 +11,7 @@ namespace DBlockchain.Infrastructure.Command.Contracts
 
         string Send(string[] args);
 
-        string Aggregate();
+        string Aggregate(SocketDataBody data);
 
         void Receive(SocketDataBody data);
 

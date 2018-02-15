@@ -59,7 +59,7 @@ namespace DBlockchain.Logic.Commands.AllCommands
             return targets;
         }
 
-        public string Aggregate()
+        public string Aggregate(SocketDataBody data)
         {
             var port = AsyncListener.Port;
             string hostName = Dns.GetHostName(); // Retrive the Name of HOST
