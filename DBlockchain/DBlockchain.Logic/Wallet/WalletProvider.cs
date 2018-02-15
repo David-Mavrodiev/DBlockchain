@@ -17,7 +17,7 @@ namespace DBlockchain.Logic.Wallet
 
         public WalletProvider()
         {
-            var bytes = StorageFileProvider<byte[]>.GetModel(Constants.WalletFilePath);
+            var bytes = StorageFileProvider<byte[]>.GetModel(Constants.WalletPrivateKeyFilePath);
 
             if (bytes != null && bytes.Length > 0)
             {
@@ -35,6 +35,21 @@ namespace DBlockchain.Logic.Wallet
             return false;
         }
 
+        public ECPoint PublicKey
+        {
+            get
+            {
+                return CryptographyUtilities.GetPublicKeyFromPrivateKey(privateKey);
+            }
+        }
+
+        public byte[] SignTransaction(byte[] data)
+        {
+            var signiture = CryptographyUtilities.SignData(privateKey, data);
+
+            return signiture;
+        }
+
         private static void GenerateIdentity(int keySize = 256)
         {
             ECKeyPairGenerator gen = new ECKeyPairGenerator();
@@ -49,7 +64,7 @@ namespace DBlockchain.Logic.Wallet
             Console.WriteLine("Private key (hex): " + privateKey.ToString(16));
             Console.WriteLine("Private key: " + privateKey.ToString(10));
 
-            StorageFileProvider<byte[]>.SetModel(Constants.WalletFilePath, privateKey.ToByteArray());
+            StorageFileProvider<byte[]>.SetModel(Constants.WalletPrivateKeyFilePath, privateKey.ToByteArray());
 
             ECPoint pubKey = ((ECPublicKeyParameters)keyPair.Public).Q;
 

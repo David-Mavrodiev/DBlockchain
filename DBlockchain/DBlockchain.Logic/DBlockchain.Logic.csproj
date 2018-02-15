@@ -108,6 +108,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Commands\AllCommands\AddTransaction.cs" />
     <Compile Include="Commands\AllCommands\Connect.cs" />
     <Compile Include="Commands\AllCommands\WalletCreation.cs" />
     <Compile Include="Commands\Contracts\ICommandFabric.cs" />

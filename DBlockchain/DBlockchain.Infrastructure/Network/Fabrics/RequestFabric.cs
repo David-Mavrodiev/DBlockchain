@@ -22,13 +22,13 @@ namespace DBlockchain.Infrastructure.Network.Fabrics
 
             foreach (var target in targets)
             {
-                System.Console.WriteLine("Ui");
                 var socket = client.StartSocket(target.Item1, target.Item2);
 
                 var data = new SocketDataBody()
                 {
                     CommandName = commandName,
-                    Body = body
+                    Body = body,
+                    Type = SocketDataType.Send
                 };
 
                 client.Send(socket, data);

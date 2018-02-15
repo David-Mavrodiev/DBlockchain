@@ -8,6 +8,8 @@ namespace DBlockchain.Infrastructure.Network
 
         public string Body { get; set; }
 
+        public SocketDataType Type { get; set; }
+
         public override string ToString()
         {
             return JsonConvert.SerializeObject(this);

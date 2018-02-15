@@ -59,6 +59,7 @@
     <Compile Include="Network\Fabrics\RequestFabric.cs" />
     <Compile Include="Network\Fabrics\ResponseFabric.cs" />
     <Compile Include="Network\SocketDataBody.cs" />
+    <Compile Include="Network\SocketDataType.cs" />
     <Compile Include="Network\StateObject.cs" />
     <Compile Include="Network\StorageFileProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

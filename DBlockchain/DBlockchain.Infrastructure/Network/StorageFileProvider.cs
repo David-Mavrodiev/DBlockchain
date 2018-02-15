@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using System;
 using System.IO;
 
 namespace DBlockchain.Infrastructure.Network
@@ -21,6 +20,12 @@ namespace DBlockchain.Infrastructure.Network
             }
 
             return model;
+        }
+
+        public static bool HasContent(string path)
+        {
+            var content = File.ReadAllText(path);
+            return content != null && content != string.Empty;
         }
 
         public static void SetModel(string path, T model)

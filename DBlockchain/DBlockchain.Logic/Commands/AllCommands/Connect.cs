@@ -28,6 +28,24 @@ namespace DBlockchain.Logic.Commands.AllCommands
 
         public void Receive(SocketDataBody data)
         {
+            if (data.Type == SocketDataType.Receive && data.Body != null)
+            {
+                var ip = data.Body.Split(':')[0];
+                var port = int.Parse(data.Body.Split(':')[1]);
+
+                var isAdded = this.blockchain.RegisterNode(ip, port);
+
+                if (isAdded)
+                {
+                    Console.WriteLine($"{ip}:{port}");
+                    Console.WriteLine("Peer added successfully...");
+                }
+                else
+                {
+                    Console.WriteLine("Cannot add peer...");
+                }
+            }
+
             Console.WriteLine("Receive connection...");
             Console.WriteLine($"Command: {data.CommandName}, Body: {data.Body}");
         }
@@ -43,7 +61,11 @@ namespace DBlockchain.Logic.Commands.AllCommands
 
         public string Aggregate()
         {
-            return "response body";
+            var port = AsyncListener.Port;
+            string hostName = Dns.GetHostName(); // Retrive the Name of HOST
+            string ip = Dns.GetHostByName(hostName).AddressList[0].ToString();
+
+            return $"{ip}:{port}";
         }
     }
 }
