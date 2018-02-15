@@ -110,6 +110,8 @@
   <ItemGroup>
     <Compile Include="Commands\AllCommands\AddTransaction.cs" />
     <Compile Include="Commands\AllCommands\Connect.cs" />
+    <Compile Include="Commands\AllCommands\GetBalance.cs" />
+    <Compile Include="Commands\AllCommands\GetPeers.cs" />
     <Compile Include="Commands\AllCommands\WalletCreation.cs" />
     <Compile Include="Commands\Contracts\ICommandFabric.cs" />
     <Compile Include="Commands\Fabrics\CommandFabric.cs" />

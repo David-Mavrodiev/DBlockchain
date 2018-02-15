@@ -8,7 +8,6 @@ using DBlockchain.Infrastructure.Network;
 using DBlockchain.Logic.Models;
 using DBlockchain.Logic.Commands.Fabrics;
 using DBlockchain.Logic.Wallet;
-using DBlockchain.Logic.Utils;
 using Newtonsoft.Json;
 
 namespace DBlockchain.Logic.Commands.AllCommands
@@ -54,8 +53,7 @@ namespace DBlockchain.Logic.Commands.AllCommands
 
         public string Send(string[] args)
         {
-            string pubKeyCompressed = CryptographyUtilities.EncodeECPointHexCompressed(walletProvider.PublicKey);
-            string from = CryptographyUtilities.CalcRipeMD160(pubKeyCompressed);
+            string from = walletProvider.Address;
             var to = args[1];
             var amount = decimal.Parse(args[2]);
 
@@ -67,6 +65,22 @@ namespace DBlockchain.Logic.Commands.AllCommands
             var transaction = this.blockchain.AddTransaction(from, to, amount, walletProvider);
 
             return JsonConvert.SerializeObject(transaction);
+        }
+
+        public bool ValidateInput(string[] args)
+        {
+            string from = walletProvider.Address;
+            var to = args[1];
+            var amount = decimal.Parse(args[2]);
+            var balances = this.blockchain.GetBalances(0);
+
+            if (balances.ContainsKey(from) && balances[from] < amount)
+            {
+                Console.WriteLine("Not enought coins...");
+                return false;
+            }
+
+            return true;
         }
     }
 }

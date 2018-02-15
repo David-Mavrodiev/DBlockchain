@@ -4,7 +4,6 @@ using DBlockchain.Logic.Utils;
 using DBlockchain.Logic.Wallet;
 using Newtonsoft.Json;
 using Org.BouncyCastle.Math.EC;
-using Org.BouncyCastle.Utilities.Encoders;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -16,6 +15,7 @@ namespace DBlockchain.Logic.Models
 {
     public class Blockchain
     {
+        private IDictionary<string, decimal> balances { get; set; }
         private IList<Node> peers;
         private readonly IList<Block> blocks;
         private IList<Transaction> pendingTransactions;
@@ -26,6 +26,7 @@ namespace DBlockchain.Logic.Models
             this.peers = new List<Node>();
             this.blocks = new List<Block>();
             this.pendingTransactions = new List<Transaction>();
+            this.balances = new Dictionary<string, decimal>();
 
             this.Load();
 
@@ -33,6 +34,8 @@ namespace DBlockchain.Logic.Models
             {
                 this.CreateGenesis();
             }
+
+            this.CalculateBalances(0);
         }
 
         public IList<Node> Peers
@@ -41,6 +44,53 @@ namespace DBlockchain.Logic.Models
             {
                 return this.peers;
             }
+        }
+
+        public IDictionary<string, decimal> GetBalances(int confirmations)
+        {
+            this.CalculateBalances(confirmations);
+
+            return this.balances;
+        }
+
+        private void CalculateBalances(int confirmations)
+        {
+            var balances = new Dictionary<string, decimal>();
+
+            foreach (var genesisTransactions in blocks[0].Transactions)
+            {
+                balances.Add(genesisTransactions.To, genesisTransactions.Value);
+            }
+
+            foreach (var block in blocks.Skip(1).Take(blocks.Count - confirmations))
+            {
+                foreach (var transaction in block.Transactions)
+                {
+                    var senderPublicKey = CryptographyUtilities.DecodeECPointFromHex(transaction.SenderPublicKey);
+                    var bytes = Encoding.UTF8.GetBytes(transaction.TransactionHash);
+
+                    if (CryptographyUtilities.VerifySigniture(bytes, transaction.SenderSignature, senderPublicKey))
+                    {
+                        balances[transaction.From] -= transaction.Value;
+
+                        if (balances.ContainsKey(transaction.To))
+                        {
+                            balances[transaction.To] += transaction.Value;
+                        }
+                        else
+                        {
+                            balances.Add(transaction.To, transaction.Value);
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("Found incorrect signiture...");
+                        return;
+                    }
+                }
+            }
+
+            this.balances = balances;
         }
 
         public void CreateGenesis()
@@ -57,7 +107,7 @@ namespace DBlockchain.Logic.Models
             var transaction = new Transaction()
             {
                 From = "GENESIS",
-                To = "",
+                To = "369644fed2583779f7d16a1bc22748e86f72574d",
                 Value = 1000000000000000,
                 SenderPublicKey = null,
                 SenderSignature = null
@@ -78,6 +128,8 @@ namespace DBlockchain.Logic.Models
 
             string path = $"{Constants.BlocksFilePath}/block_0.json";
             StorageFileProvider<Block>.SetModel(path, genesisBlock);
+
+            this.blocks.Add(genesisBlock);
         }
 
         public void Load()
@@ -134,9 +186,17 @@ namespace DBlockchain.Logic.Models
 
         public Transaction AddTransaction(string from, string to, decimal amount, WalletProvider walletProvider)
         {
+            this.CalculateBalances(0);
+
+            if (balances.ContainsKey(from) && balances[from] < amount)
+            {
+                Console.WriteLine("Not enought coins...");
+                return null;
+            }
+
             var publicKeyHex = CryptographyUtilities.BytesToHex(walletProvider.PublicKey.GetEncoded());
             var transaction = new Transaction()
-                {
+            {
                     From = from,
                     To = to,
                     Value = amount,

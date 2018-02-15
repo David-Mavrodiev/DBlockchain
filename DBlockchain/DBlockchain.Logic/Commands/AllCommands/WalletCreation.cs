@@ -31,6 +31,7 @@ namespace DBlockchain.Logic.Commands.AllCommands
             else
             {
                 Console.WriteLine("Already has wallet...");
+                Console.WriteLine(walletProvider.Address);
             }
         }
     }

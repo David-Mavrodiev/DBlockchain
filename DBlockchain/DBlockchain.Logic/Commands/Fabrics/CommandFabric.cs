@@ -61,7 +61,10 @@ namespace DBlockchain.Logic.Commands.Fabrics
 
                 var args = ReverseStringFormat(attribute.Template, input).ToArray();
 
-                requestFabric.MakeRequest(name, args, globalCommand, attribute);
+                if (globalCommand.ValidateInput(args))
+                {
+                    requestFabric.MakeRequest(name, args, globalCommand, attribute);
+                }
             }
         }
 

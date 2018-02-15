@@ -43,6 +43,17 @@ namespace DBlockchain.Logic.Wallet
             }
         }
 
+        public string Address
+        {
+            get
+            {
+                string pubKeyCompressed = CryptographyUtilities.EncodeECPointHexCompressed(this.PublicKey);
+                string address = CryptographyUtilities.CalcRipeMD160(pubKeyCompressed);
+
+                return address;
+            }
+        }
+
         public byte[] SignTransaction(byte[] data)
         {
             var signiture = CryptographyUtilities.SignData(privateKey, data);

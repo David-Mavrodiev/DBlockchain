@@ -67,5 +67,10 @@ namespace DBlockchain.Logic.Commands.AllCommands
 
             return $"{ip}:{port}";
         }
+
+        public bool ValidateInput(string[] args)
+        {
+            return true;
+        }
     }
 }

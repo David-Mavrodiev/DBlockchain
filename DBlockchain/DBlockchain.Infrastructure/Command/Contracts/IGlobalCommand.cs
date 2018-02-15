@@ -7,6 +7,8 @@ namespace DBlockchain.Infrastructure.Command.Contracts
 {
     public interface IGlobalCommand
     {
+        bool ValidateInput(string[] args);
+
         string Send(string[] args);
 
         string Aggregate();
