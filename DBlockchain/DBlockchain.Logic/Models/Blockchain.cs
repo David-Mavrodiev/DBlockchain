@@ -132,7 +132,7 @@ namespace DBlockchain.Logic.Models
             var transaction = new Transaction()
             {
                 From = "GENESIS",
-                To = "369644fed2583779f7d16a1bc22748e86f72574d",
+                To = "160be11d7889bf867c756294c5abb64e92bd8a88",
                 Value = 1000000000000000,
                 SenderPublicKey = null,
                 SenderSignature = null

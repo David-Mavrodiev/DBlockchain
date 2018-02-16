@@ -17,11 +17,42 @@ namespace DBlockchain.Logic.Wallet
 
         public WalletProvider()
         {
-            var bytes = StorageFileProvider<byte[]>.GetModel(Constants.WalletPrivateKeyFilePath);
+            UnlockWallet();
+        }
 
-            if (bytes != null && bytes.Length > 0)
+        public static void UnlockWallet()
+        {
+            if (privateKey == null)
             {
-                privateKey = new BigInteger(bytes);
+                var encryptedPrivateKey = StorageFileProvider<string>.GetModel(Constants.WalletEncryptedPrivateKeyFilePath);
+
+                if (encryptedPrivateKey != null && encryptedPrivateKey != string.Empty)
+                {
+                    Console.WriteLine("Type your password:");
+                    var password = Console.ReadLine();
+
+                    while (true)
+                    {
+                        try
+                        {
+                            Console.WriteLine("Unlock wallet...");
+                            var bytes = CryptographyUtilities.Decrypt(encryptedPrivateKey, password);
+
+                            if (bytes != null && bytes.Length > 0)
+                            {
+                                privateKey = new BigInteger(bytes);
+                            }
+
+                            break;
+                        }
+                        catch
+                        {
+                            Console.WriteLine("Incorrect password...");
+                            Console.WriteLine("Type your password again:");
+                            password = Console.ReadLine();
+                        }
+                    }
+                }
             }
         }
 
@@ -75,7 +106,11 @@ namespace DBlockchain.Logic.Wallet
             Console.WriteLine("Private key (hex): " + privateKey.ToString(16));
             Console.WriteLine("Private key: " + privateKey.ToString(10));
 
-            StorageFileProvider<byte[]>.SetModel(Constants.WalletPrivateKeyFilePath, privateKey.ToByteArray());
+            Console.WriteLine("Password for private key encryption:");
+            var password = Console.ReadLine();
+            var encryptedPrivateKey = CryptographyUtilities.Encrypt(privateKey.ToByteArray(), password);
+
+            StorageFileProvider<string>.SetModel(Constants.WalletEncryptedPrivateKeyFilePath, encryptedPrivateKey);
 
             ECPoint pubKey = ((ECPublicKeyParameters)keyPair.Public).Q;
 

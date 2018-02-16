@@ -3,6 +3,7 @@ using DBlockchain.Infrastructure.Network;
 using DBlockchain.Infrastructure.Network.Fabrics.Contracts;
 using DBlockchain.Logic.Commands.Contracts;
 using DBlockchain.Logic.Models;
+using DBlockchain.Logic.Wallet;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
@@ -16,6 +17,7 @@ namespace DBlockchain.Logic.Commands.Fabrics
 
         public CommandFabric(IRequestFabric fabric, AsyncListener asyncListener, Blockchain blockchain)
         {
+            WalletProvider.UnlockWallet();
             requestFabric = fabric;
             listener = asyncListener;
             Blockchain = blockchain;

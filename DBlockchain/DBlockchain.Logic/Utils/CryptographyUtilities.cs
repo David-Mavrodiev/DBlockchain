@@ -8,7 +8,9 @@ using Org.BouncyCastle.Math.EC;
 using Org.BouncyCastle.Security;
 using Org.BouncyCastle.Utilities.Encoders;
 using System;
+using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace DBlockchain.Logic.Utils
@@ -16,6 +18,7 @@ namespace DBlockchain.Logic.Utils
     public static class CryptographyUtilities
     {
         public static readonly X9ECParameters curve = SecNamedCurves.GetByName("secp256k1");
+        public static Random rand = new Random();
 
         public static ECPoint GetPublicKeyFromPrivateKey(BigInteger privKey)
         {
@@ -82,6 +85,55 @@ namespace DBlockchain.Logic.Utils
             ECPoint point = CryptographyUtilities.curve.Curve.DecodePoint(Hex.Decode(hex)).Normalize();
 
             return point;
+        }
+
+        public static string Encrypt(byte[] clearBytes, string password)
+        {
+            string encryptedBytes = string.Empty;
+
+            using (Aes encryptor = Aes.Create())
+            {
+                byte[] IV = new byte[15];    
+                rand.NextBytes(IV);
+                Rfc2898DeriveBytes pdb = new Rfc2898DeriveBytes(password, IV);
+                encryptor.Key = pdb.GetBytes(32);
+                encryptor.IV = pdb.GetBytes(16);
+                using (MemoryStream ms = new MemoryStream())
+                {
+                    using (CryptoStream cs = new CryptoStream(ms, encryptor.CreateEncryptor(), CryptoStreamMode.Write))
+                    {
+                        cs.Write(clearBytes, 0, clearBytes.Length);
+                        cs.Close();
+                    }
+                    encryptedBytes = Convert.ToBase64String(IV) + Convert.ToBase64String(ms.ToArray());
+                }
+            }
+
+            return encryptedBytes;
+        }
+
+        public static byte[] Decrypt(string encryptedBytes, string password)
+        {
+            byte[] bytes = null;
+            byte[] IV = Convert.FromBase64String(encryptedBytes.Substring(0, 20));
+            encryptedBytes = encryptedBytes.Substring(20).Replace(" ", "+");
+            byte[] cipherBytes = Convert.FromBase64String(encryptedBytes);
+            using (Aes encryptor = Aes.Create())
+            {
+                Rfc2898DeriveBytes pdb = new Rfc2898DeriveBytes(password, IV);
+                encryptor.Key = pdb.GetBytes(32);
+                encryptor.IV = pdb.GetBytes(16);
+                using (MemoryStream ms = new MemoryStream())
+                {
+                    using (CryptoStream cs = new CryptoStream(ms, encryptor.CreateDecryptor(), CryptoStreamMode.Write))
+                    {
+                        cs.Write(cipherBytes, 0, cipherBytes.Length);
+                        cs.Close();
+                    }
+                    bytes = ms.ToArray();
+                }
+            }
+            return bytes;
         }
     }
 }
