@@ -1,0 +1,30 @@
+﻿@model List<DBlockchain.Logic.Models.Transaction>
+
+@{
+    ViewData["Title"] = "All Transactions";
+}
+<div class="all-transactions-container">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <h1>All Transactions</h1>
+        <table class="table table-hover table-striped">
+            <tbody>
+                @foreach (var transaction in Model)
+                {
+                    <tr class="media">
+                        <td class="media-left"></td>
+                        <td class="media-body">
+                            <h4 class="media-heading font-yellow text-bold hidden-xs">
+                                <b>Hash: <a href="/Transactions/Details/@transaction.TransactionHash">@transaction.TransactionHash</a></b>
+                            </h4>
+
+                            <span>From: <span class="label label-info">@transaction.From</span></span>
+                            <span>To: <span class="label label-info">@transaction.To</span></span>
+                            <br />
+                            <span><strong>Amount: </strong>@transaction.Value</span>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

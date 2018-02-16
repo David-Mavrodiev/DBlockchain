@@ -1,0 +1,49 @@
+﻿@model DBlockchain.Logic.Models.Block
+
+@{
+    ViewData["Title"] = "Block Details";
+}
+
+<div class="container-fluid well span6 block-details">
+    <div class="row-fluid">
+        <div class="span8">
+            <h1><b>Block</b>: @Model.Index</h1>
+            <h4><b>Mined By</b>: @Model.MinedBy</h4>
+            <h4><b>Block hash</b>: @Model.BlockHash</h4>
+            <h4><b>Creation date</b>: <span class="label label-success">@Model.DateCreated</span></h4>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid well span6 block-details">
+    @if (Model.Transactions.Count > 0)
+    {
+        <h2><b>Transactions</b></h2>
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <table class="table table-hover table-striped">
+                <tbody>
+                    @foreach (var transaction in Model.Transactions)
+                    {
+                        <tr class="media">
+                            <td class="media-left"></td>
+                            <td class="media-body">
+                                <h4 class="media-heading font-yellow text-bold hidden-xs">
+                                    <b>Hash: <a href="/Transactions/Details/@transaction.TransactionHash">@transaction.TransactionHash</a></b>
+                                </h4>
+
+                                <span>From: <span class="label label-info">@transaction.From</span></span>
+                                <span>To: <span class="label label-info">@transaction.To</span></span>
+                                <br />
+                                <span><strong>Amount: </strong> @transaction.Value</span>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <h2><b>No Transactions</b></h2>
+    }
+</div>

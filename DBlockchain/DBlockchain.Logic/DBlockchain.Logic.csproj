@@ -126,7 +126,9 @@
     <Compile Include="Models\Wallet.cs" />
     <Compile Include="NinjectBindings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utils\Contracts\IExplorerService.cs" />
     <Compile Include="Utils\CryptographyUtilities.cs" />
+    <Compile Include="Utils\ExplorerService.cs" />
     <Compile Include="Wallet\WalletProvider.cs" />
   </ItemGroup>
   <ItemGroup>

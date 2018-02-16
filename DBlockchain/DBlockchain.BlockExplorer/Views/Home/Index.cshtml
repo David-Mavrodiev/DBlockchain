@@ -1,0 +1,78 @@
+﻿@model DBlockchain.BlockExplorer.Models.HomeViewModel
+
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+            <h1>Last 5 blocks</h1>
+            <table class="table table-hover table-striped">
+                <tbody>
+                    @foreach (var block in Model.Blocks)
+                    {
+                        <tr class="media">
+                            <td class="media-left">
+                                <h3><a href="/Blocks/Details/@block.Index">@block.Index</a></h3>
+                            </td>
+                            <td class="media-body">
+                                <h4 class="media-heading font-yellow text-bold hidden-xs">
+                                    <b>Mined by: @block.MinedBy</b>
+                                </h4>
+                                
+                                <span>Creation date: <span class="label label-success">@block.DateCreated</span></span>
+                                <br />
+                                <span><strong>Transactions count:</strong> @block.Transactions.Count</span>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+            <h1>Pending transactions:</h1>
+            <table class="table table-hover table-striped">
+                <tbody>
+                    @foreach (var transaction in Model.PendingTransactions)
+                    {
+                        <tr class="media">
+                            <td class="media-left"></td>
+                            <td class="media-body">
+                                <h4 class="media-heading font-yellow text-bold hidden-xs">
+                                    <b>Hash: @transaction.TransactionHash</b>
+                                </h4>
+
+                                <span>From: <span class="label label-info">@transaction.From</span></span>
+                                <span>To: <span class="label label-info">@transaction.To</span></span>
+                                <br />
+                                <span><strong>Amount: </strong> @transaction.Value</span>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<style>
+    .container, .container-fluid {
+        margin-top: 15px;
+    }
+
+    tr > td.media-left {
+        width: 72px !important;
+        height: 30px;
+        padding: 0 10px;
+        background-color: #eee;
+    }
+
+    .table .media .media-body > span {
+        color: #999;
+        font-size: 15px;
+    }
+
+    .table .media .media-body span strong {
+        color: #777;
+    }
+</style>

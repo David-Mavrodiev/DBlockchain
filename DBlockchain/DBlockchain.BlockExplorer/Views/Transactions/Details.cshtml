@@ -1,0 +1,18 @@
+﻿@model DBlockchain.Logic.Models.Transaction
+
+@{
+    ViewData["Title"] = "Transaction Details";
+}
+
+<div class="container-fluid well span6 transaction-details">
+    <div class="row-fluid">
+        <div class="span8">
+            <h1><b>Hash</b>: @Model.TransactionHash</h1>
+            <h4><b>From</b>: @Model.From</h4>
+            <h4><b>To</b>: @Model.To</h4>
+            <h4><b>Amount</b>: @Model.Value</h4>
+            <h4><b>Mined in block: </b>: @Model.MinedInBlockIndex</h4>
+            <h4><b>Receive date</b>: <span class="label label-success">@Model.DateReceived</span></h4>
+        </div>
+    </div>
+</div>
