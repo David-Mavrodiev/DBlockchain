@@ -254,23 +254,22 @@ namespace DBlockchain.Logic.Models
 
         public Block AddBlock(Block block)
         {
-            int nonce = block.Nonce;
-            string lastBlockHash = this.LastBlock.BlockHash;
-            string winnerHash = CryptographyUtilities.BytesToHex(CryptographyUtilities.CalcSHA256($"{lastBlockHash}{nonce}"));
+            Console.WriteLine("Try add block...");
 
-            if (!winnerHash.ToCharArray().Take(this.Difficulty).All(s => s == '0'))
+            if (ValidateBlock(block))
             {
-                Console.WriteLine("Incorrect winner hash...");
-                return null;
+                this.blocks.Add(block);
+                StorageFileProvider<Block>.SetModel($"{Constants.BlocksFilePath}/block_{block.Index}.json", block);
+
+                //Shoud think :-)
+                this.pendingTransactions = new List<Transaction>();
+
+                Console.WriteLine("Done...");
+
+                return block;
             }
 
-            this.blocks.Add(block);
-            StorageFileProvider<Block>.SetModel($"{Constants.BlocksFilePath}/block_{block.Index}.json", block);
-
-            //Shoud think :-)
-            this.pendingTransactions = new List<Transaction>();
-
-            return block;
+            return null;
         }
 
         public Transaction AddTransaction(string from, string to, decimal amount, WalletProvider walletProvider)
@@ -314,27 +313,171 @@ namespace DBlockchain.Logic.Models
 
         public Transaction AddTransaction(Transaction transaction)
         {
-            var bytes = Encoding.UTF8.GetBytes(transaction.TransactionHash);
             Console.WriteLine("Try add pending transaction...");
 
-            ECPoint senderPublicKey = CryptographyUtilities.DecodeECPointFromHex(transaction.SenderPublicKey);
-
-            if (CryptographyUtilities.VerifySigniture(bytes, transaction.SenderSignature, senderPublicKey))
+            if (ValidateTransaction(transaction))
             {
                 Console.WriteLine("Done...");
 
                 this.pendingTransactions.Add(transaction);
-
                 StorageFileProvider<Transaction[]>.SetModel(Constants.PendingTransactionsFilePath, this.pendingTransactions.ToArray());
 
                 return transaction;
             }
+            
+            return null;
+        }
+
+        private bool ValidateTransaction(Transaction transaction, IDictionary<string, decimal> futureBalances = null)
+        {
+            IDictionary<string, decimal> balances;
+            bool inSimulationMode = false;
+
+            if (futureBalances != null)
+            {
+                inSimulationMode = true;
+                balances = futureBalances;
+            }
             else
             {
-                Console.WriteLine("Incorrect signiture...");
-
-                return null;
+                balances = GetBalances(0);
             }
+
+            var bytes = Encoding.UTF8.GetBytes(transaction.TransactionHash);
+
+            ECPoint senderPublicKey = CryptographyUtilities.DecodeECPointFromHex(transaction.SenderPublicKey);
+
+            if (!CryptographyUtilities.VerifySigniture(bytes, transaction.SenderSignature, senderPublicKey))
+            {
+                Console.WriteLine("^^^^^^^^^^^^^^^^^^^^^^^^^");
+                Console.WriteLine("Transaction validation failed...");
+                Console.WriteLine("INFO -> incorrect signiture...");
+                return false;
+            }
+
+            if (!balances.ContainsKey(transaction.From) || balances[transaction.From] < transaction.Value)
+            {
+                Console.WriteLine("^^^^^^^^^^^^^^^^^^^^^^^^^");
+                Console.WriteLine("Transaction validation failed...");
+                Console.WriteLine("INFO -> not enought money of sender...");
+                return false;
+            }
+
+            if (inSimulationMode)
+            {
+                balances[transaction.From] -= transaction.Value;
+            }
+
+            var copyOftransaction = new Transaction()
+            {
+                From = transaction.From,
+                To = transaction.To,
+                Value = transaction.Value,
+                SenderPublicKey = transaction.SenderPublicKey
+            };
+
+            var transactionJson = JsonConvert.SerializeObject(copyOftransaction);
+            var transactionHash = CryptographyUtilities.BytesToHex(CryptographyUtilities.CalcSHA256(transactionJson));
+
+            if (transactionHash != transaction.TransactionHash)
+            {
+                Console.WriteLine("^^^^^^^^^^^^^^^^^^^^^^^^^");
+                Console.WriteLine("Transaction validation failed...");
+                Console.WriteLine("INFO -> incorrect transaction hash...");
+                return false;
+            }
+
+            Console.WriteLine("Transaction validation success...");
+
+            return true;
+        }
+
+        public bool ValidateBlock(Block block, IDictionary<string, decimal> futureBalances = null)
+        {
+            Console.WriteLine("Validate block...");
+
+            int nonce = block.Nonce;
+            string lastBlockHash = this.LastBlock.BlockHash;
+            string winnerHash = CryptographyUtilities.BytesToHex(CryptographyUtilities.CalcSHA256($"{lastBlockHash}{nonce}"));
+
+            if (!winnerHash.ToCharArray().Take(this.Difficulty).All(s => s == '0'))
+            {
+                Console.WriteLine("^^^^^^^^^^^^^^^^^^^^^^^^^");
+                Console.WriteLine("Block validation failed...");
+                Console.WriteLine("INFO -> Incorrect winner hash...");
+                return false;
+            }
+
+            var copyOfBlock = new Block()
+            {
+                Index = block.Index,
+                DateCreated = block.DateCreated,
+                Difficulty = block.Difficulty,
+                MinedBy = block.MinedBy,
+                Nonce = block.Nonce,
+                PreviousBlockHash = block.PreviousBlockHash,
+                Transactions = block.Transactions
+            };
+
+            string blockJson = JsonConvert.SerializeObject(copyOfBlock);
+            var blockHash = CryptographyUtilities.BytesToHex(CryptographyUtilities.CalcSHA256(blockJson));
+
+            if (blockHash != block.BlockHash)
+            {
+                Console.WriteLine("^^^^^^^^^^^^^^^^^^^^^^^^^");
+                Console.WriteLine("Block validation failed...");
+                Console.WriteLine("INFO -> Incorrect block hash...");
+                return false;
+            }
+
+            IDictionary<string, decimal> balances;
+
+            if (futureBalances != null)
+            {
+                balances = futureBalances;
+            }
+            else
+            {
+                balances = GetBalances(0);
+            }
+
+            foreach (var transaction in block.Transactions)
+            {
+                if (ValidateTransaction(transaction, balances))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        public bool ValidateChain(IList<Block> blocks)
+        {
+            Console.WriteLine("Validate chain...");
+
+            var balances = GetBalances(0);
+
+            for (int i = 0; i < blocks.Count; i++)
+            {
+                if (!ValidateBlock(blocks[i], balances))
+                {
+                    Console.WriteLine("^^^^^^^^^^^^^^^^^^^^^^^^^");
+                    Console.WriteLine("Chain is not valid...");
+                    return false;
+                }
+
+                if (i > 0 && blocks[i - 1].BlockHash != blocks[i].PreviousBlockHash)
+                {
+                    Console.WriteLine("^^^^^^^^^^^^^^^^^^^^^^^^^");
+                    Console.WriteLine("Block validation failed...");
+                    Console.WriteLine("INFO -> Hashes between two blocks is not valid...");
+                    return false;
+                }
+            }
+
+            Console.WriteLine("Chain is valid...");
+            return true;
         }
     }
 }
