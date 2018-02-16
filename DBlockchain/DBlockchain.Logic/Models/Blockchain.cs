@@ -248,6 +248,7 @@ namespace DBlockchain.Logic.Models
 
             //Shoud think :-)
             this.pendingTransactions = new List<Transaction>();
+            StorageFileProvider<Transaction[]>.SetModel(Constants.PendingTransactionsFilePath, this.pendingTransactions.ToArray());
 
             return block;
         }
@@ -263,6 +264,7 @@ namespace DBlockchain.Logic.Models
 
                 //Shoud think :-)
                 this.pendingTransactions = new List<Transaction>();
+                StorageFileProvider<Transaction[]>.SetModel(Constants.PendingTransactionsFilePath, this.pendingTransactions.ToArray());
 
                 Console.WriteLine("Done...");
 
