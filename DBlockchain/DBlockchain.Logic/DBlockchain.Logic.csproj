@@ -129,6 +129,7 @@
     <Compile Include="Utils\Contracts\IExplorerService.cs" />
     <Compile Include="Utils\CryptographyUtilities.cs" />
     <Compile Include="Utils\ExplorerService.cs" />
+    <Compile Include="Wallet\Contracts\IWalletProvider.cs" />
     <Compile Include="Wallet\WalletProvider.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -141,5 +142,6 @@
     <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

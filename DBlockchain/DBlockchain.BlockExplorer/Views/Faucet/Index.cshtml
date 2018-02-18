@@ -1,0 +1,18 @@
+﻿@model FaucetTransactionViewModel
+
+@{
+    ViewData["Title"] = "Faucet";
+}
+
+<div class="container">
+    <form asp-action="Send" asp-controller="Faucet">
+        <h1 class="form-signin-heading">Faucet</h1>
+        <div class="input-group input-group-lg">
+            <span class="input-group-addon">ADDRESS</span>
+            <input asp-for="To" type="text" class="form-control" placeholder="Please enter address">
+        </div>
+        <br>
+        <button class="btn btn-lg btn-primary btn-block" type="submit" name="convert">Send 5 coins</button>
+        <br>
+    </form>
+</div>

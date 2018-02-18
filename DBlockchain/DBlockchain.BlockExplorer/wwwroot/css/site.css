@@ -171,9 +171,18 @@ footer iframe {
     padding-bottom: 1%;
 }
 
+.all-blocks-container table{
+    margin-bottom: 200px;
+}
+
+.all-transactions-container table{
+    margin-bottom: 200px;
+}
+
 .block-details, .transaction-details {
     margin: 1%;
 }
+
 /* Hide/rearrange for smaller screens */
 @media screen and (max-width: 767px) {
     /* Hide captions */

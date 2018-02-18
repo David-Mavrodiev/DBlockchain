@@ -1,4 +1,5 @@
 ﻿using DBlockchain.BlockExplorer.Utils;
+using DBlockchain.Infrastructure.Common;
 using DBlockchain.Logic.Models;
 using DBlockchain.Logic.Utils;
 using DBlockchain.Logic.Utils.Contracts;
@@ -19,7 +20,7 @@ namespace DBlockchain.BlockExplorer.Controllers
 
         public IActionResult Index()
         {
-            var blocks = this.exploreService.LoadBlocks(Constants.BlocksFolder);
+            var blocks = this.exploreService.LoadBlocks(Constants.BlocksFilePath);
             List<Transaction> transactions = new List<Transaction>();
 
             foreach (var block in blocks)
@@ -34,7 +35,7 @@ namespace DBlockchain.BlockExplorer.Controllers
 
         public IActionResult Details(string id)
         {
-            var blocks = this.exploreService.LoadBlocks(Constants.BlocksFolder);
+            var blocks = this.exploreService.LoadBlocks(Constants.BlocksFilePath);
             List<Transaction> transactions = new List<Transaction>();
 
             foreach (var block in blocks)

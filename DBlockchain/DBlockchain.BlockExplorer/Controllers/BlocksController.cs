@@ -1,4 +1,5 @@
 ﻿using DBlockchain.BlockExplorer.Utils;
+using DBlockchain.Infrastructure.Common;
 using DBlockchain.Logic.Utils;
 using DBlockchain.Logic.Utils.Contracts;
 using Microsoft.AspNetCore.Mvc;
@@ -17,8 +18,8 @@ namespace DBlockchain.BlockExplorer.Controllers
 
         public IActionResult Index()
         {
-            var pendingTransactions = exploreService.LoadPendingTransactions(Constants.PendingTransactionsPath);
-            var blocks = this.exploreService.LoadBlocks(Constants.BlocksFolder);
+            var pendingTransactions = exploreService.LoadPendingTransactions(Constants.PendingTransactionsFilePath);
+            var blocks = this.exploreService.LoadBlocks(Constants.BlocksFilePath);
             blocks.Reverse();
 
             return View(blocks.ToList());
@@ -26,7 +27,7 @@ namespace DBlockchain.BlockExplorer.Controllers
 
         public IActionResult Details(int id)
         {
-            var block = this.exploreService.LoadBlocks(Constants.BlocksFolder).First(b => b.Index == id);
+            var block = this.exploreService.LoadBlocks(Constants.BlocksFilePath).First(b => b.Index == id);
 
             return View(block);
         }

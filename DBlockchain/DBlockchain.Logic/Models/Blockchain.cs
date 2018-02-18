@@ -2,6 +2,7 @@
 using DBlockchain.Infrastructure.Network;
 using DBlockchain.Logic.Utils;
 using DBlockchain.Logic.Wallet;
+using DBlockchain.Logic.Wallet.Contracts;
 using Newtonsoft.Json;
 using Org.BouncyCastle.Math.EC;
 using System;
@@ -132,7 +133,7 @@ namespace DBlockchain.Logic.Models
             var transaction = new Transaction()
             {
                 From = "GENESIS",
-                To = "160be11d7889bf867c756294c5abb64e92bd8a88",
+                To = "e39f2a9daf79084f96b28d0b92439b0b6112981c",
                 Value = 1000000000000000,
                 SenderPublicKey = null,
                 SenderSignature = null
@@ -274,7 +275,7 @@ namespace DBlockchain.Logic.Models
             return null;
         }
 
-        public Transaction AddTransaction(string from, string to, decimal amount, WalletProvider walletProvider)
+        public Transaction AddTransaction(string from, string to, decimal amount, IWalletProvider walletProvider)
         {
             this.CalculateBalances(0);
 

@@ -5,6 +5,7 @@ using System.Linq;
 using DBlockchain.Logic.Utils;
 using DBlockchain.BlockExplorer.Utils;
 using DBlockchain.Logic.Utils.Contracts;
+using DBlockchain.Infrastructure.Common;
 
 namespace DBlockchain.BlockExplorer.Controllers
 {
@@ -19,14 +20,15 @@ namespace DBlockchain.BlockExplorer.Controllers
 
         public IActionResult Index()
         {
-            var pendingTransactions = this.exploreService.LoadPendingTransactions(Constants.PendingTransactionsPath);
-            var blocks = exploreService.LoadBlocks(Constants.BlocksFolder);
+            var pendingTransactions = this.exploreService.LoadPendingTransactions(Constants.PendingTransactionsFilePath);
+            var blocks = exploreService.LoadBlocks(Constants.BlocksFilePath);
             blocks.Reverse();
+            pendingTransactions.Reverse();
 
             var viewModel = new HomeViewModel()
             {
                 Blocks = blocks.Take(5).ToList(),
-                PendingTransactions = pendingTransactions
+                PendingTransactions = pendingTransactions.Take(5).ToList()
             };
 
             return View(viewModel);

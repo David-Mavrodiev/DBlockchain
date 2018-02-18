@@ -1,6 +1,7 @@
 ﻿using DBlockchain.Infrastructure.Common;
 using DBlockchain.Infrastructure.Network;
 using DBlockchain.Logic.Utils;
+using DBlockchain.Logic.Wallet.Contracts;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Generators;
 using Org.BouncyCastle.Crypto.Parameters;
@@ -11,7 +12,7 @@ using System;
 
 namespace DBlockchain.Logic.Wallet
 {
-    public class WalletProvider
+    public class WalletProvider : IWalletProvider
     {
         private static BigInteger privateKey;
 

@@ -58,14 +58,18 @@ namespace DBlockchain.Logic.Commands.Fabrics
             else
             {
                 var global = CommandsReflector.GetGlobalCommand(name);
-                var globalCommand = global.Item1;
-                var attribute = global.Item2;
 
-                var args = ReverseStringFormat(attribute.Template, input).ToArray();
-
-                if (globalCommand.ValidateInput(args))
+                if (global.Item1 != null)
                 {
-                    requestFabric.MakeRequest(name, args, globalCommand, attribute);
+                    var globalCommand = global.Item1;
+                    var attribute = global.Item2;
+
+                    var args = ReverseStringFormat(attribute.Template, input).ToArray();
+
+                    if (globalCommand.ValidateInput(args))
+                    {
+                        requestFabric.MakeRequest(name, args, globalCommand, attribute);
+                    }
                 }
             }
         }
@@ -88,14 +92,18 @@ namespace DBlockchain.Logic.Commands.Fabrics
             else
             {
                 var global = CommandsReflector.GetGlobalCommand(name);
-                var globalCommand = global.Item1;
-                var attribute = global.Item2;
 
-                var args = ReverseStringFormat(attribute.Template, input).ToArray();
-
-                if (globalCommand.ValidateInput(args))
+                if (global.Item1 != null)
                 {
-                    requestFabric.MakeRequest(name, args, globalCommand, attribute);
+                    var globalCommand = global.Item1;
+                    var attribute = global.Item2;
+
+                    var args = ReverseStringFormat(attribute.Template, input).ToArray();
+
+                    if (globalCommand.ValidateInput(args))
+                    {
+                        requestFabric.MakeRequest(name, args, globalCommand, attribute);
+                    }
                 }
             }
         }
