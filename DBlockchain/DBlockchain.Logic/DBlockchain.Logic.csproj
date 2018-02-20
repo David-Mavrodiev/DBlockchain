@@ -115,6 +115,8 @@
     <Compile Include="Commands\AllCommands\GetPeers.cs" />
     <Compile Include="Commands\AllCommands\Mining\Mine.cs" />
     <Compile Include="Commands\AllCommands\Mining\SendMiningResult.cs" />
+    <Compile Include="Commands\AllCommands\Mining\StopMine.cs" />
+    <Compile Include="Commands\AllCommands\ShowThreads.cs" />
     <Compile Include="Commands\AllCommands\Sync.cs" />
     <Compile Include="Commands\AllCommands\WalletCreation.cs" />
     <Compile Include="Commands\Contracts\ICommandFabric.cs" />

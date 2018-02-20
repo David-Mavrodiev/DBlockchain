@@ -1,10 +1,13 @@
 ﻿using DBlockchain.Infrastructure.Command.Helpers;
 using DBlockchain.Infrastructure.Network;
 using DBlockchain.Infrastructure.Network.Fabrics.Contracts;
+using DBlockchain.Logic.Commands.AllCommands.Mining;
 using DBlockchain.Logic.Commands.Contracts;
 using DBlockchain.Logic.Models;
 using DBlockchain.Logic.Wallet;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace DBlockchain.Logic.Commands.Fabrics
@@ -14,6 +17,7 @@ namespace DBlockchain.Logic.Commands.Fabrics
         private static IRequestFabric requestFabric;
         private static AsyncListener listener;
         private static Blockchain blockchain;
+        private static IDictionary<string, int> threadsInfo;
 
         public CommandFabric(IRequestFabric fabric, AsyncListener asyncListener, Blockchain blockchain)
         {
@@ -22,6 +26,7 @@ namespace DBlockchain.Logic.Commands.Fabrics
             listener = asyncListener;
             Blockchain = blockchain;
             listener.StartListening();
+            threadsInfo = new Dictionary<string, int>();
         }
 
         public static Blockchain Blockchain
@@ -37,6 +42,14 @@ namespace DBlockchain.Logic.Commands.Fabrics
                 {
                     blockchain = value;
                 }
+            }
+        }
+
+        public static IDictionary<string, int> ThreadsInfo
+        {
+            get
+            {
+                return threadsInfo;
             }
         }
 

@@ -1,13 +1,10 @@
 ﻿using DBlockchain.Infrastructure.Command.Contracts;
 using DBlockchain.Infrastructure.Command.Enums;
 using DBlockchain.Infrastructure.Commands.Attributes;
-using DBlockchain.Logic.Commands.Contracts;
 using DBlockchain.Logic.Commands.Fabrics;
 using DBlockchain.Logic.Models;
 using DBlockchain.Logic.Utils;
-using Ninject;
 using System;
-using System.IO;
 using System.Linq;
 using System.Threading;
 
@@ -23,12 +20,19 @@ namespace DBlockchain.Logic.Commands.AllCommands.Mining
             this.blockchain = CommandFabric.Blockchain;
         }
 
+        public static bool StopThread { get; set; }
+
+        public static bool IsMining { get; set; }
+
         public void Run(string[] args)
         {
             Console.WriteLine("Start mining...");
 
+            IsMining = true;
             Thread thread = new Thread(MineAsync);
             thread.Start();
+
+            CommandFabric.ThreadsInfo.Add("Mining", thread.ManagedThreadId);
         }
 
         public void NextBlockMined(string hash, int nonce)
@@ -46,10 +50,15 @@ namespace DBlockchain.Logic.Commands.AllCommands.Mining
         public void MineAsync()
         {
             int nonce = 0;
-            string hash;
+            string hash = string.Empty;
 
             while (true)
             {
+                if (StopThread)
+                {
+                    break;
+                }
+
                 var lastBlockHash = this.blockchain.LastBlock.BlockHash;
                 hash = CryptographyUtilities.BytesToHex(CryptographyUtilities.CalcSHA256($"{lastBlockHash}{nonce}"));
 
@@ -62,10 +71,17 @@ namespace DBlockchain.Logic.Commands.AllCommands.Mining
                 nonce++;
             }
 
-            NextBlockMined(hash, nonce);
+            if (!StopThread)
+            {
+                NextBlockMined(hash, nonce);
 
-            Thread thread = new Thread(MineAsync);
-            thread.Start();
+                Thread thread = new Thread(MineAsync);
+                thread.Start();
+
+                var miningThread = CommandFabric.ThreadsInfo.First(t => t.Key == "Mining");
+                CommandFabric.ThreadsInfo.Remove(miningThread);
+                CommandFabric.ThreadsInfo.Add("Mining", thread.ManagedThreadId);
+            }
         }
     }
 }

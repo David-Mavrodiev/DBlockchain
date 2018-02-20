@@ -28,6 +28,12 @@ namespace DBlockchain.Infrastructure.Network.Fabrics
             {
                 var socket = client.StartSocket(target.Item1, target.Item2);
 
+                if (!AsyncClient.CanConnect)
+                {
+                    Console.WriteLine($"Cannot connect to {target.Item1}:{target.Item2}");
+                    continue;
+                }
+
                 var data = new SocketDataBody()
                 {
                     CommandName = commandName,

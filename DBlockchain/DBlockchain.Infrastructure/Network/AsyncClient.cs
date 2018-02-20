@@ -13,6 +13,7 @@ namespace DBlockchain.Infrastructure.Network
         public static ManualResetEvent connectDone = new ManualResetEvent(false);
         public static ManualResetEvent sendDone = new ManualResetEvent(false);
         public static ManualResetEvent receiveDone = new ManualResetEvent(false);
+        public static bool CanConnect = true;
 
         private static SocketDataBody response;
         private IResponseFabric responseFabric;
@@ -24,6 +25,9 @@ namespace DBlockchain.Infrastructure.Network
 
         public Socket StartSocket(IPAddress address, int port)
         {
+            connectDone.Reset();
+            CanConnect = true;
+
             IPEndPoint remoteEP = new IPEndPoint(address, port);
             // Create a TCP/IP socket.  
             Socket client = new Socket(address.AddressFamily,
@@ -51,6 +55,13 @@ namespace DBlockchain.Infrastructure.Network
                 // Retrieve the socket from the state object.  
                 Socket client = (Socket)ar.AsyncState;
 
+                if (!IsAvailable(client))
+                {
+                    CanConnect = false;
+                    connectDone.Set();
+                    return;
+                }
+
                 // Complete the connection.  
                 client.EndConnect(ar);
 
@@ -59,8 +70,13 @@ namespace DBlockchain.Infrastructure.Network
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.ToString());
+                Console.WriteLine(e.StackTrace);
             }
+        }
+
+        public static bool IsAvailable(Socket client)
+        {
+            return !((client.Poll(1000, SelectMode.SelectRead) && (client.Available == 0)) || !client.Connected);
         }
 
         public void Receive(Socket client)
@@ -77,7 +93,7 @@ namespace DBlockchain.Infrastructure.Network
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.ToString());
+                Console.WriteLine("Cannot receive...");
             }
         }
 
@@ -117,7 +133,7 @@ namespace DBlockchain.Infrastructure.Network
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.ToString());
+                Console.WriteLine("Cannot receive callback...");
             }
         }
 
@@ -146,7 +162,7 @@ namespace DBlockchain.Infrastructure.Network
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.ToString());
+                Console.WriteLine("Cannot send...");
             }
         }
     }
