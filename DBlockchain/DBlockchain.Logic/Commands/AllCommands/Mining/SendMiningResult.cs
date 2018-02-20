@@ -28,7 +28,30 @@ namespace DBlockchain.Logic.Commands.AllCommands
 
         public string Aggregate(SocketDataBody data)
         {
-            return this.blockchain.LastBlock.Index.ToString();
+            var block = JsonConvert.DeserializeObject<Block>(data.Body);
+
+            if (block.Index == this.blockchain.LastBlock.Index &&
+                    block.BlockHash == this.blockchain.LastBlock.BlockHash)
+            {
+                Console.WriteLine("All is synced...");
+                return string.Empty;
+            }
+            else
+            {
+                if (block.Index > this.blockchain.LastBlock.Index)
+                {
+                    var ip = data.NodesPair.Item1.Split(':')[0];
+                    var port = int.Parse(data.NodesPair.Item1.Split(':')[1]);
+
+                    CommandFabric.RunDynamic($"sync -ip {ip} -p {port}");
+
+                    return string.Empty;
+                }
+                else
+                {
+                    return JsonConvert.SerializeObject(this.blockchain.Blocks.Where(b => b.Index != 0).ToArray());
+                }
+            }
         }
 
         public List<Tuple<IPAddress, int>> GetTargets(string[] args)
@@ -67,27 +90,33 @@ namespace DBlockchain.Logic.Commands.AllCommands
                 }
                 else
                 {
-                    Console.WriteLine("This node may not synced with 2 or more blocks...");
-                    Console.WriteLine("Checking...");
+                    if (block.Index <= this.blockchain.LastBlock.Index)
+                    {
+                        Console.WriteLine("Other node is not synced...");
+                    }
+                    else
+                    {
+                        Console.WriteLine("This node is not synced...");
 
-                    var ip = data.NodesPair.Item1.Split(':')[0];
-                    var port = int.Parse(data.NodesPair.Item1.Split(':')[1]);
+                        var ip = data.NodesPair.Item1.Split(':')[0];
+                        var port = int.Parse(data.NodesPair.Item1.Split(':')[1]);
 
-                    CommandFabric.RunDynamic($"sync -ip {ip} -p {port}");
+                        CommandFabric.RunDynamic($"sync -ip {ip} -p {port}");
+                    }
                 }
             }
             else if(data.Type == SocketDataType.Receive)
             {
-                int blockIndex = int.Parse(data.Body);
-                if (blockIndex > this.blockchain.LastBlock.Index)
+                if (data.Body != string.Empty)
                 {
-                    Console.WriteLine("This node may not synced with 1 or more blocks...");
-                    Console.WriteLine("Checking...");
+                    var newBlocks = JsonConvert.DeserializeObject<Block[]>(data.Body).ToList();
 
-                    var ip = data.NodesPair.Item2.Split(':')[0];
-                    var port = int.Parse(data.NodesPair.Item2.Split(':')[1]);
+                    this.blockchain.RemoveBlockInterval(newBlocks.First().Index, newBlocks.Last().Index);
 
-                    CommandFabric.RunDynamic($"sync -ip {ip} -p {port}");
+                    foreach (var block in newBlocks)
+                    {
+                        this.blockchain.AddBlock(block);
+                    }
                 }
             }
         }

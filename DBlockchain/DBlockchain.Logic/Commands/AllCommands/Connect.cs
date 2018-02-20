@@ -63,7 +63,8 @@ namespace DBlockchain.Logic.Commands.AllCommands
         {
             var port = AsyncListener.Port;
             string hostName = Dns.GetHostName(); // Retrive the Name of HOST
-            string ip = Dns.GetHostByName(hostName).AddressList[0].ToString();
+            var ips = Dns.GetHostByName(hostName).AddressList;
+            string ip = ips[ips.Length - 1].ToString();
 
             return $"{ip}:{port}";
         }

@@ -20,8 +20,9 @@ namespace DBlockchain.Infrastructure.Network.Fabrics
             var body = command.Send(args);
             var targets = command.GetTargets(args);
 
-            string hostName = Dns.GetHostName(); // Retrive the Name of HOST  
-            string ip = Dns.GetHostByName(hostName).AddressList[0].ToString();
+            string hostName = Dns.GetHostName(); // Retrive the Name of HOST 
+            var ips = Dns.GetHostByName(hostName).AddressList;
+            string ip = ips[ips.Length - 1].ToString();
 
             foreach (var target in targets)
             {

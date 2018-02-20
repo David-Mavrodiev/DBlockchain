@@ -24,35 +24,14 @@ namespace DBlockchain.Logic.Commands.AllCommands
 
         public string Aggregate(SocketDataBody data)
         {
+            Console.WriteLine("Sync aggregate");
             var lastBlockInfo = JsonConvert.DeserializeObject<Tuple<int, string>>(data.Body);
             var lastBlockIndex = lastBlockInfo.Item1;
             var lastBlockHash = lastBlockInfo.Item2;
 
-            if (lastBlockIndex < this.blockchain.LastBlock.Index)
+            if (lastBlockIndex <= this.blockchain.LastBlock.Index)
             {
-                if (this.blockchain.Blocks[lastBlockIndex].BlockHash == lastBlockHash)
-                {
-                    var newBlocks = this.blockchain.Blocks.Skip(lastBlockIndex).ToArray();
-
-                    return JsonConvert.SerializeObject(newBlocks);
-                }
-                else
-                {
-                    int skip = 0;
-
-                    foreach (var block in this.blockchain.Blocks)
-                    {
-                        if (block.BlockHash == lastBlockHash)
-                        {
-                            skip = block.Index;
-                            break;
-                        }
-                    }
-
-                    var newBlocks = this.blockchain.Blocks.Skip(skip).ToArray();
-
-                    return JsonConvert.SerializeObject(newBlocks);
-                }
+                return JsonConvert.SerializeObject(this.blockchain.Blocks.Where(b => b.Index != 0).ToArray());
             }
             else
             {
@@ -70,19 +49,21 @@ namespace DBlockchain.Logic.Commands.AllCommands
         }
 
         public void Receive(SocketDataBody data)
-        {            
+        {
             if (data.Type == SocketDataType.Receive)
             {
                 if (data.Body != string.Empty)
                 {
-                    Console.WriteLine("Adding new blocks...");
                     var newBlocks = JsonConvert.DeserializeObject<Block[]>(data.Body).ToList();
-                    newBlocks.Reverse();
+                    
+                    this.blockchain.RemoveBlockInterval(newBlocks.First().Index, newBlocks.Last().Index);
 
                     foreach (var block in newBlocks)
                     {
                         this.blockchain.AddBlock(block);
                     }
+
+                    Console.WriteLine("End syncing...");
                 }
                 else
                 {
@@ -93,6 +74,7 @@ namespace DBlockchain.Logic.Commands.AllCommands
 
         public string Send(string[] args)
         {
+            Console.WriteLine("Start syncing...");
             var lastBlockInfo = new Tuple<int, string>(this.blockchain.LastBlock.Index, this.blockchain.LastBlock.BlockHash);
 
             return JsonConvert.SerializeObject(lastBlockInfo);

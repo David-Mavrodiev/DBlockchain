@@ -11,6 +11,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Threading;
 
 namespace DBlockchain.Logic.Models
 {
@@ -77,6 +78,30 @@ namespace DBlockchain.Logic.Models
             this.CalculateBalances(confirmations);
 
             return this.balances;
+        }
+
+        public void RemoveBlockInterval(int from, int to)
+        {
+            Console.WriteLine($"Romove blocks from {from} to {to}...");
+            int lastBlockIndex = this.LastBlock.Index;
+
+            for (int i = from; i <= to; i++)
+            {
+                if (i > lastBlockIndex)
+                {
+                    break;
+                }
+
+                if (i == 0)
+                {
+                    continue;
+                }
+
+                var oldBlock = this.blocks.First(b => b.Index == i);
+                this.blocks.Remove(oldBlock);
+
+                File.Delete($"{Constants.BlocksFilePath}/block_{i}.json");
+            }
         }
 
         private void CalculateBalances(int confirmations)
@@ -408,6 +433,8 @@ namespace DBlockchain.Logic.Models
                 Console.WriteLine("^^^^^^^^^^^^^^^^^^^^^^^^^");
                 Console.WriteLine("Block validation failed...");
                 Console.WriteLine("INFO -> Incorrect winner hash...");
+                Console.WriteLine($"Block number: {block.Index}, last block: {this.LastBlock.Index}");
+
                 return false;
             }
 
