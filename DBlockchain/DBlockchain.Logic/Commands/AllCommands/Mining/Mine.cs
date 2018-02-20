@@ -59,6 +59,11 @@ namespace DBlockchain.Logic.Commands.AllCommands.Mining
                     break;
                 }
 
+                if (this.blockchain.LastBlock == null)
+                {
+                    continue;
+                }
+
                 var lastBlockHash = this.blockchain.LastBlock.BlockHash;
                 hash = CryptographyUtilities.BytesToHex(CryptographyUtilities.CalcSHA256($"{lastBlockHash}{nonce}"));
 

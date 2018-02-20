@@ -25,7 +25,7 @@ namespace DBlockchain.Infrastructure.Network
         public void StartListening()
         {
             // Data buffer for incoming data.  
-            byte[] bytes = new Byte[1024 * 20];
+            byte[] bytes = new Byte[1024 * 100];
 
             string hostName = Dns.GetHostName(); // Retrive the Name of HOST  
             var ips = Dns.GetHostByName(hostName).AddressList;

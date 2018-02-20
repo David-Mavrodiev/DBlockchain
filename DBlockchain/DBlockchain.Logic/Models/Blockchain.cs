@@ -53,7 +53,14 @@ namespace DBlockchain.Logic.Models
         {
             get
             {
-                return this.blocks.Last();
+                int lastIndex = blocks.Count - 1;
+
+                if (lastIndex < 0)
+                {
+                    return null;
+                }
+
+                return blocks[lastIndex];
             }
         }
 
@@ -102,6 +109,8 @@ namespace DBlockchain.Logic.Models
 
                 File.Delete($"{Constants.BlocksFilePath}/block_{i}.json");
             }
+
+            Load();
         }
 
         private void CalculateBalances(int confirmations)

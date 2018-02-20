@@ -7,7 +7,7 @@ namespace DBlockchain.Infrastructure.Network
     {
         public Socket workSocket = null;
 
-        public const int BufferSize = 256 * 20;
+        public const int BufferSize = 256 * 100;
 
         public byte[] buffer = new byte[BufferSize];
 
