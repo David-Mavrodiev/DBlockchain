@@ -54,6 +54,7 @@
     <Compile Include="Network\AsyncClient.cs" />
     <Compile Include="Network\AsyncListener.cs" />
     <Compile Include="Command\Contracts\IGlobalCommand.cs" />
+    <Compile Include="Network\DFileStorage.cs" />
     <Compile Include="Network\Fabrics\Contracts\IRequestFabric.cs" />
     <Compile Include="Network\Fabrics\Contracts\IResponseFabric.cs" />
     <Compile Include="Network\Fabrics\RequestFabric.cs" />
