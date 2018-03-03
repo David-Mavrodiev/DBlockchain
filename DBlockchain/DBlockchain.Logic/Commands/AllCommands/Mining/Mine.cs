@@ -1,10 +1,13 @@
 ﻿using DBlockchain.Infrastructure.Command.Contracts;
 using DBlockchain.Infrastructure.Command.Enums;
 using DBlockchain.Infrastructure.Commands.Attributes;
+using DBlockchain.Infrastructure.Common;
+using DBlockchain.Infrastructure.Network;
 using DBlockchain.Logic.Commands.Fabrics;
 using DBlockchain.Logic.Models;
 using DBlockchain.Logic.Utils;
 using System;
+using System.IO;
 using System.Linq;
 using System.Threading;
 
@@ -51,31 +54,48 @@ namespace DBlockchain.Logic.Commands.AllCommands.Mining
         {
             int nonce = 0;
             string hash = string.Empty;
-
-            while (true)
+            
+            try
             {
-                if (StopThread)
+                string lastBlockPath = Directory.GetFiles($"{Constants.BlocksFilePath}/", "*.json")
+                    .OrderBy(n => int.Parse(n.Split('_')[1].Replace(".json", ""))).ToList().Last();
+                string lastBlockHash = StorageFileProvider<Block>.GetModel(lastBlockPath).BlockHash;
+
+                int counter = 0;
+
+                while (true)
                 {
-                    break;
+                    counter++;
+
+                    if (StopThread)
+                    {
+                        break;
+                    }
+
+                    if (counter > 100000)
+                    {
+                        lastBlockPath = Directory.GetFiles($"{Constants.BlocksFilePath}/", "*.json")
+                        .OrderBy(n => int.Parse(n.Split('_')[1].Replace(".json", ""))).ToList().Last();
+
+                        lastBlockHash = StorageFileProvider<Block>.GetModel(lastBlockPath).BlockHash;
+                        counter = 0;
+                    }
+
+                    hash = CryptographyUtilities.BytesToHex(CryptographyUtilities.CalcSHA256($"{lastBlockHash}{nonce}"));
+
+                    if (hash.ToCharArray().Take(this.blockchain.Difficulty).All(s => s == '0'))
+                    {
+                        break;
+                    }
+
+                    nonce++;
                 }
-
-                if (this.blockchain.LastBlock == null)
-                {
-                    continue;
-                }
-
-                var lastBlockHash = this.blockchain.LastBlock.BlockHash;
-                hash = CryptographyUtilities.BytesToHex(CryptographyUtilities.CalcSHA256($"{lastBlockHash}{nonce}"));
-
-                if (hash.ToCharArray().Take(this.blockchain.Difficulty).All(s => s == '0'))
-                {
-                    
-                    break;
-                }
-
-                nonce++;
             }
+            catch
+            {
 
+            }
+            
             if (!StopThread)
             {
                 NextBlockMined(hash, nonce);

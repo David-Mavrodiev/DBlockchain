@@ -110,6 +110,7 @@
   <ItemGroup>
     <Compile Include="Commands\AllCommands\AddTransaction.cs" />
     <Compile Include="Commands\AllCommands\Connect.cs" />
+    <Compile Include="Commands\AllCommands\DeepSync.cs" />
     <Compile Include="Commands\AllCommands\GetBalance.cs" />
     <Compile Include="Commands\AllCommands\GetAccountInfo.cs" />
     <Compile Include="Commands\AllCommands\GetPeers.cs" />

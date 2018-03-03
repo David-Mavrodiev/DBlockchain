@@ -1,13 +1,10 @@
 ﻿using DBlockchain.Infrastructure.Command.Helpers;
 using DBlockchain.Infrastructure.Network;
 using DBlockchain.Infrastructure.Network.Fabrics.Contracts;
-using DBlockchain.Logic.Commands.AllCommands.Mining;
 using DBlockchain.Logic.Commands.Contracts;
 using DBlockchain.Logic.Models;
 using DBlockchain.Logic.Wallet;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace DBlockchain.Logic.Commands.Fabrics

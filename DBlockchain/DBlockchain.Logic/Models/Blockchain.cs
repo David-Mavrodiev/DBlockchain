@@ -110,7 +110,7 @@ namespace DBlockchain.Logic.Models
                 File.Delete($"{Constants.BlocksFilePath}/block_{i}.json");
             }
 
-            Load();
+            this.blocks.OrderBy(b => b.Index);
         }
 
         private void CalculateBalances(int confirmations)
@@ -124,6 +124,11 @@ namespace DBlockchain.Logic.Models
 
             foreach (var block in blocks.Skip(1).Take(blocks.Count - confirmations))
             {
+                if (block.Index == 0)
+                {
+                    continue;
+                }
+
                 foreach (var transaction in block.Transactions)
                 {
                     var senderPublicKey = CryptographyUtilities.DecodeECPointFromHex(transaction.SenderPublicKey);
@@ -291,6 +296,13 @@ namespace DBlockchain.Logic.Models
         public Block AddBlock(Block block)
         {
             Console.WriteLine("Try add block...");
+
+            if (block.Index == 0)
+            {
+                Console.WriteLine();
+                Console.WriteLine(block.Index);
+                Console.WriteLine();
+            }
 
             if (ValidateBlock(block))
             {

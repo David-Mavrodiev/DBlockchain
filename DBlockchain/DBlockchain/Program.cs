@@ -22,6 +22,8 @@ namespace DBlockchain
 
                 commandFabric.RunCommand(input);
             }
+
+            Console.ReadKey();
         }
 
         public static void DrawTitle()

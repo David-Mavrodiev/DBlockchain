@@ -43,7 +43,7 @@ namespace DBlockchain.BlockExplorer.Utils
 
                 if (encryptedPrivateKey != null && encryptedPrivateKey != string.Empty)
                 {
-                    var password = "test";
+                    var password = "david";
 
                     var bytes = CryptographyUtilities.Decrypt(encryptedPrivateKey, password);
 

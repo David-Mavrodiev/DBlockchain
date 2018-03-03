@@ -29,9 +29,18 @@ namespace DBlockchain.Logic.Commands.AllCommands
             var lastBlockIndex = lastBlockInfo.Item1;
             var lastBlockHash = lastBlockInfo.Item2;
 
-            if (lastBlockIndex <= this.blockchain.LastBlock.Index)
+            if (lastBlockIndex <= this.blockchain.LastBlock.Index && this.blockchain.Blocks[lastBlockIndex].BlockHash == lastBlockHash)
             {
-                return JsonConvert.SerializeObject(this.blockchain.Blocks.Where(b => b.Index != 0).ToArray());
+                var blocks = this.blockchain.Blocks.GetRange(lastBlockIndex,
+                    (this.blockchain.Blocks.Count - lastBlockIndex)).ToArray();
+
+                return JsonConvert.SerializeObject(blocks);
+            }
+            else if (lastBlockIndex <= this.blockchain.LastBlock.Index && this.blockchain.Blocks[lastBlockIndex].BlockHash != lastBlockHash)
+            {
+                Console.WriteLine("Another node must deep sync...");
+
+                return "deep-sync";
             }
             else
             {
@@ -52,7 +61,7 @@ namespace DBlockchain.Logic.Commands.AllCommands
         {
             if (data.Type == SocketDataType.Receive)
             {
-                if (data.Body != string.Empty)
+                if (data.Body != string.Empty && data.Body != "deep-sync")
                 {
                     var newBlocks = JsonConvert.DeserializeObject<Block[]>(data.Body).ToList();
                     
@@ -64,6 +73,14 @@ namespace DBlockchain.Logic.Commands.AllCommands
                     }
 
                     Console.WriteLine("End syncing...");
+                }
+                else if (data.Body == "deep-sync")
+                {
+                    Console.WriteLine("Start deep sync procedure...");
+                    var ip = data.NodesPair.Item2.Split(':')[0];
+                    var port = int.Parse(data.NodesPair.Item2.Split(':')[1]);
+
+                    CommandFabric.RunDynamic($"deep-sync -ip {ip} -p {port}");
                 }
                 else
                 {

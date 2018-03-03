@@ -108,6 +108,7 @@ namespace DBlockchain.Infrastructure.Network
 
                 // Check for end-of-file tag. If it is not there, read   
                 // more data.
+                
                 content = JsonConvert.DeserializeObject<SocketDataBody>(state.sb.ToString());
 
                 if (content != null)

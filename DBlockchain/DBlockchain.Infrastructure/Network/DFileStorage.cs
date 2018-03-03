@@ -4,6 +4,7 @@ using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace DBlockchain.Infrastructure.Network
 {
@@ -39,26 +40,46 @@ namespace DBlockchain.Infrastructure.Network
                     {
                         string folderPath = @"DecentralizedStorage/";
                         int receivedBytesLen = handlerSocket.Receive(dataByte);
-                        int fileNameLen = BitConverter.ToInt32(dataByte, 0);
-                        fileName = Encoding.ASCII.GetString(dataByte, 4, fileNameLen);
 
-                        if (!File.Exists(folderPath + fileName))
+                        if (Encoding.UTF8.GetString(dataByte).Contains("get-file"))
                         {
-                            Stream fileStream = File.OpenWrite(folderPath + fileName);
-                            fileStream.Write(dataByte, 4 + fileNameLen, (1024 - (4 + fileNameLen)));
-                            while (true)
-                            {
-                                thisRead = networkStream.Read(dataByte, 0, blockSize);
-                                fileStream.Write(dataByte, 0, thisRead);
-                                if (thisRead == 0)
-                                    break;
-                            }
-                            fileStream.Close();
+                            var template = "get-file -address {0} -name {1}";
+                            var args = ReverseStringFormat(template, Encoding.UTF8.GetString(dataByte));
 
-                            foreach (var peer in this.peers)
+                            var targetIp = args[0].Split(':')[0];
+                            var targetPort = int.Parse(args[0].Split(':')[1]);
+                            var targetFileName = args[1].Trim('\0');
+
+                            Console.WriteLine($"Get file {targetIp}:{targetPort} -> {targetFileName}...");
+                            Console.WriteLine($"File is located in {folderPath}{targetFileName}...");
+
+                            this.SendFile(targetIp, targetPort, $"{folderPath}{targetFileName}", targetFileName);
+                            
+                            continue;
+                        }
+                        else
+                        {
+                            int fileNameLen = BitConverter.ToInt32(dataByte, 0);
+                            fileName = Encoding.ASCII.GetString(dataByte, 4, fileNameLen);
+
+                            if (!File.Exists(folderPath + fileName))
                             {
-                                Console.WriteLine($"Send received file to {peer.Item1}:{peer.Item2}...");
-                                this.SendFile(peer.Item1, peer.Item2, (folderPath + fileName), fileName);
+                                Stream fileStream = File.OpenWrite(folderPath + fileName);
+                                fileStream.Write(dataByte, 4 + fileNameLen, (1024 - (4 + fileNameLen)));
+                                while (true)
+                                {
+                                    thisRead = networkStream.Read(dataByte, 0, blockSize);
+                                    fileStream.Write(dataByte, 0, thisRead);
+                                    if (thisRead == 0)
+                                        break;
+                                }
+                                fileStream.Close();
+
+                                foreach (var peer in this.peers)
+                                {
+                                    Console.WriteLine($"Send received file to {peer.Item1}:{peer.Item2}...");
+                                    this.SendFile(peer.Item1, peer.Item2, (folderPath + fileName), fileName);
+                                }
                             }
                         }
                     }
@@ -83,6 +104,23 @@ namespace DBlockchain.Infrastructure.Network
                 networkStream.Write(clientData, 0, clientData.GetLength(0));
                 networkStream.Close();
             }
+        }
+
+        private static List<string> ReverseStringFormat(string template, string str)
+        {
+            string pattern = "^" + Regex.Replace(template, @"\{[0-9]+\}", "(.*?)") + "$";
+
+            Regex r = new Regex(pattern);
+            Match m = r.Match(str);
+
+            List<string> ret = new List<string>();
+
+            for (int i = 1; i < m.Groups.Count; i++)
+            {
+                ret.Add(m.Groups[i].Value);
+            }
+
+            return ret;
         }
     }
 }

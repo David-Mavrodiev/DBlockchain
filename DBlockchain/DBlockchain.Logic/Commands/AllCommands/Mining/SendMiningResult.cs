@@ -49,7 +49,8 @@ namespace DBlockchain.Logic.Commands.AllCommands
                 }
                 else
                 {
-                    return JsonConvert.SerializeObject(this.blockchain.Blocks.Where(b => b.Index != 0).ToArray());
+                    return "sync";
+                    //return JsonConvert.SerializeObject(this.blockchain.Blocks.Where(b => b.Index != 0).ToArray());
                 }
             }
         }
@@ -107,17 +108,24 @@ namespace DBlockchain.Logic.Commands.AllCommands
             }
             else if(data.Type == SocketDataType.Receive)
             {
-                if (data.Body != string.Empty)
+                if (data.Body == "sync")
                 {
-                    var newBlocks = JsonConvert.DeserializeObject<Block[]>(data.Body).ToList();
+                    var ip = data.NodesPair.Item2.Split(':')[0];
+                    var port = int.Parse(data.NodesPair.Item2.Split(':')[1]);
 
-                    this.blockchain.RemoveBlockInterval(newBlocks.First().Index, newBlocks.Last().Index);
-
-                    foreach (var block in newBlocks)
-                    {
-                        this.blockchain.AddBlock(block);
-                    }
+                    CommandFabric.RunDynamic($"sync -ip {ip} -p {port}");
                 }
+                //if (data.Body != string.Empty)
+                //{
+                //    var newBlocks = JsonConvert.DeserializeObject<Block[]>(data.Body).ToList();
+
+                //    this.blockchain.RemoveBlockInterval(newBlocks.First().Index, newBlocks.Last().Index);
+
+                //    foreach (var block in newBlocks)
+                //    {
+                //        this.blockchain.AddBlock(block);
+                //    }
+                //}
             }
         }
 
