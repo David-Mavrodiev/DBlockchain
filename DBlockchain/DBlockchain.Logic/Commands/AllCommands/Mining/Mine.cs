@@ -85,6 +85,18 @@ namespace DBlockchain.Logic.Commands.AllCommands.Mining
 
                     if (hash.ToCharArray().Take(this.blockchain.Difficulty).All(s => s == '0'))
                     {
+                        string currentLastBlockPath = Directory.GetFiles($"{Constants.BlocksFilePath}/", "*.json")
+                        .OrderBy(n => int.Parse(n.Split('_')[1].Replace(".json", ""))).ToList().Last();
+
+                        string newLastBlockHash = StorageFileProvider<Block>.GetModel(currentLastBlockPath).BlockHash;
+                        counter = 0;
+
+                        if (newLastBlockHash != lastBlockHash)
+                        {
+                            nonce = 0;
+                            continue;
+                        }
+
                         break;
                     }
 

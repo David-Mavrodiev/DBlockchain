@@ -24,25 +24,32 @@ namespace DBlockchain.Logic.Commands.AllCommands
 
         public string Aggregate(SocketDataBody data)
         {
-            Console.WriteLine("Sync aggregate");
-            var lastBlockInfo = JsonConvert.DeserializeObject<Tuple<int, string>>(data.Body);
-            var lastBlockIndex = lastBlockInfo.Item1;
-            var lastBlockHash = lastBlockInfo.Item2;
-
-            if (lastBlockIndex <= this.blockchain.LastBlock.Index && this.blockchain.Blocks[lastBlockIndex].BlockHash == lastBlockHash)
+            try
             {
-                var blocks = this.blockchain.Blocks.GetRange(lastBlockIndex,
-                    (this.blockchain.Blocks.Count - lastBlockIndex)).ToArray();
+                Console.WriteLine("Sync aggregate");
+                var lastBlockInfo = JsonConvert.DeserializeObject<Tuple<int, string>>(data.Body);
+                var lastBlockIndex = lastBlockInfo.Item1;
+                var lastBlockHash = lastBlockInfo.Item2;
 
-                return JsonConvert.SerializeObject(blocks);
-            }
-            else if (lastBlockIndex <= this.blockchain.LastBlock.Index && this.blockchain.Blocks[lastBlockIndex].BlockHash != lastBlockHash)
-            {
-                Console.WriteLine("Another node must deep sync...");
+                if (lastBlockIndex <= this.blockchain.LastBlock.Index && this.blockchain.Blocks[lastBlockIndex].BlockHash == lastBlockHash)
+                {
+                    var blocks = this.blockchain.Blocks.GetRange(lastBlockIndex,
+                        (this.blockchain.Blocks.Count - lastBlockIndex)).ToArray();
 
-                return "deep-sync";
+                    return JsonConvert.SerializeObject(blocks);
+                }
+                else if (lastBlockIndex <= this.blockchain.LastBlock.Index && this.blockchain.Blocks[lastBlockIndex].BlockHash != lastBlockHash)
+                {
+                    Console.WriteLine("Another node must deep sync...");
+
+                    return "deep-sync";
+                }
+                else
+                {
+                    return string.Empty;
+                }
             }
-            else
+            catch
             {
                 return string.Empty;
             }
