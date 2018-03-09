@@ -10,7 +10,7 @@ using DBlockchain.Logic.Commands.Fabrics;
 
 namespace DBlockchain.Logic.Commands.AllCommands
 {
-    [Command("connect", "{0} -ip {1} -p {2}", CommandType.Global)]
+    [Command("connect", "{0} -ip {1} -p {2}", CommandType.Global, "Connect to peer")]
     public class Connect : IGlobalCommand
     {
         private Blockchain blockchain;

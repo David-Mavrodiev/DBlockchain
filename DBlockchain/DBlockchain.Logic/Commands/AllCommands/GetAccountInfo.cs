@@ -9,7 +9,7 @@ using System;
 
 namespace DBlockchain.Logic.Commands.AllCommands
 {
-    [Command("account-info", "{0}", CommandType.Local)]
+    [Command("account-info", "{0}", CommandType.Local, "Shows your address, public key and transaction history")]
     public class GetAccountInfo : ILocalCommand
     {
         private WalletProvider walletProvider;

@@ -12,7 +12,7 @@ using Newtonsoft.Json;
 
 namespace DBlockchain.Logic.Commands.AllCommands
 {
-    [Command("send", "{0} -to {1} -amount {2}", CommandType.Global)]
+    [Command("send", "{0} -to {1} -amount {2}", CommandType.Global, "Send money to address")]
     public class AddTransaction : IGlobalCommand
     {
         private Blockchain blockchain;

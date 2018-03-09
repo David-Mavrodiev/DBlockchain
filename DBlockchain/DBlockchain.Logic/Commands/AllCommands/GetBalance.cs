@@ -7,7 +7,7 @@ using System;
 
 namespace DBlockchain.Logic.Commands.AllCommands
 {
-    [Command("balance", "{0} -address {1} -confirms {2}", CommandType.Local)]
+    [Command("balance", "{0} -address {1} -confirms {2}", CommandType.Local, "Shows balance of address")]
     public class GetBalance : ILocalCommand
     {
         public readonly Blockchain blockchain;

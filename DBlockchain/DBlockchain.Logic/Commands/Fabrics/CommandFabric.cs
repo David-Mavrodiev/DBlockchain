@@ -115,6 +115,10 @@ namespace DBlockchain.Logic.Commands.Fabrics
                         requestFabric.MakeRequest(name, args, globalCommand, attribute);
                     }
                 }
+                else
+                {
+                    RunDynamic("help");
+                }
             }
         }
 

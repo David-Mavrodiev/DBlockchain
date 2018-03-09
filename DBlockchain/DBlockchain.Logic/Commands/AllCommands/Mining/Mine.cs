@@ -13,7 +13,7 @@ using System.Threading;
 
 namespace DBlockchain.Logic.Commands.AllCommands.Mining
 {
-    [Command("mine", "{0}", CommandType.Local)]
+    [Command("mine", "{0}", CommandType.Local, "Start mining")]
     public class Mine : ILocalCommand
     {
         private Blockchain blockchain;

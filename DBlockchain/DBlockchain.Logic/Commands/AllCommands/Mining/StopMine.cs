@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace DBlockchain.Logic.Commands.AllCommands.Mining
 {
-    [Command("stop-mine", "{0}", CommandType.Local)]
+    [Command("stop-mine", "{0}", CommandType.Local, "Stop mining")]
     public class StopMine : ILocalCommand
     {
         public void Run(string[] args)
