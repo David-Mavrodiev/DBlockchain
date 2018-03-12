@@ -91,19 +91,26 @@ namespace DBlockchain.Infrastructure.Network
 
         public void SendFile(string remoteHostIP, int remoteHostPort, string longFileName, string shortFileName)
         {
-            if (!string.IsNullOrEmpty(remoteHostIP))
+            try
             {
-                byte[] fileNameByte = Encoding.ASCII.GetBytes(shortFileName);
-                byte[] fileData = File.ReadAllBytes(longFileName);
-                byte[] clientData = new byte[4 + fileNameByte.Length + fileData.Length];
-                byte[] fileNameLen = BitConverter.GetBytes(fileNameByte.Length);
-                fileNameLen.CopyTo(clientData, 0);
-                fileNameByte.CopyTo(clientData, 4); fileData.CopyTo(clientData, 4 + fileNameByte.Length);
-                TcpClient clientSocket = new TcpClient(remoteHostIP, remoteHostPort);
-                NetworkStream networkStream = clientSocket.GetStream();
-                networkStream.Write(clientData, 0, clientData.GetLength(0));
-                networkStream.Close();
+                if (!string.IsNullOrEmpty(remoteHostIP))
+                {
+                    byte[] fileNameByte = Encoding.ASCII.GetBytes(shortFileName);
+                    byte[] fileData = File.ReadAllBytes(longFileName);
+                    byte[] clientData = new byte[4 + fileNameByte.Length + fileData.Length];
+                    byte[] fileNameLen = BitConverter.GetBytes(fileNameByte.Length);
+                    fileNameLen.CopyTo(clientData, 0);
+                    fileNameByte.CopyTo(clientData, 4); fileData.CopyTo(clientData, 4 + fileNameByte.Length);
+                    TcpClient clientSocket = new TcpClient(remoteHostIP, remoteHostPort);
+                    NetworkStream networkStream = clientSocket.GetStream();
+                    networkStream.Write(clientData, 0, clientData.GetLength(0));
+                    networkStream.Close();
+                }
             }
+            catch
+            {
+
+            }   
         }
 
         private static List<string> ReverseStringFormat(string template, string str)

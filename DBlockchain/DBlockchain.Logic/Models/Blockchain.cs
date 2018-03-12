@@ -494,7 +494,7 @@ namespace DBlockchain.Logic.Models
 
             foreach (var transaction in block.Transactions)
             {
-                if (ValidateTransaction(transaction, balances))
+                if (!ValidateTransaction(transaction, balances))
                 {
                     return false;
                 }
